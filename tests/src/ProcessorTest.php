@@ -32,4 +32,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(1, JsonProcessor::getByPath($json, '#/l1/l2/1/1'));
     }
+
+    public function testNumericKey()
+    {
+        $json = json_decode('{"l1":{"200":1}}');
+        $this->assertSame(1, JsonProcessor::getByPath($json, '#/l1/200'));
+    }
 }

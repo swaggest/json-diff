@@ -19,6 +19,7 @@ cache:
 # execute any number of scripts before the test run, custom env's are available as variables
 before_script:
   - composer install --dev --no-interaction --prefer-dist
+  - cat composer.lock
 
 matrix:
   allow_failures:

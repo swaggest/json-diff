@@ -29,7 +29,7 @@ class Diff extends Command
     static function setUpDefinition(Definition $definition, $options)
     {
         $definition->name = 'json-diff';
-        $definition->version = 'v1.1.1';
+        $definition->version = 'v1.1.2';
         $definition->description = 'JSON diff and rearrange tool for PHP, https://github.com/swaggest/json-diff';
 
         $options->action = Command\Option::create()->setIsUnnamed()->setIsRequired()

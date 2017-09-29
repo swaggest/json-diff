@@ -22,8 +22,9 @@ class JsonProcessor
                 && !is_int($key)
                 && false === filter_var($key, FILTER_VALIDATE_INT)
             ) {
+                $key = (string)$key;
                 $ref = new \stdClass();
-                $ref = &$ref->$key;
+                $ref = &$ref->{$key};
             } else {
                 $ref = &$ref[$key];
             }
@@ -31,7 +32,33 @@ class JsonProcessor
         $ref = $value;
     }
 
-    public static function getByPath(&$holder, $path)
+    private static function arrayKeyExists($key, array $a)
+    {
+        if (array_key_exists($key, $a)) {
+            return true;
+        }
+        $key = (string)$key;
+        foreach ($a as $k => $v) {
+            if ((string)$k === $key) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static function arrayGet($key, array $a)
+    {
+        $key = (string)$key;
+        foreach ($a as $k => $v) {
+            if ((string)$k === $key) {
+                return $v;
+            }
+        }
+        return false;
+    }
+
+
+    public static function getByPath($holder, $path)
     {
         $pathItems = explode('/', $path);
         if ('#' === $pathItems[0]) {
@@ -41,14 +68,14 @@ class JsonProcessor
         while (null !== $key = array_shift($pathItems)) {
             $key = urldecode($key);
             if ($ref instanceof \stdClass) {
-                $vars = get_object_vars($ref);
-                if (array_key_exists($key, $vars)) {
-                    $ref = $vars[$key];
+                $vars = (array)$ref;
+                if (self::arrayKeyExists($key, $vars)) {
+                    $ref = self::arrayGet($key, $vars);
                 } else {
                     throw new Exception('Key not found: ' . $key);
                 }
             } else {
-                if (array_key_exists($key, $ref)) {
+                if (self::arrayKeyExists($key, $ref)) {
                     $ref = $ref[$key];
                 } else {
                     throw new Exception('Key not found: ' . $key);
