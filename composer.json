@@ -1,6 +1,6 @@
 {
     "name": "swaggest/json-diff",
-    "description": "JSON diff and merge tool for PHP",
+    "description": "JSON diff and rearrange tool for PHP",
     "type": "tool",
     "license": "MIT",
     "authors": [
