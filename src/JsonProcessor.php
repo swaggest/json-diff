@@ -37,18 +37,19 @@ class JsonProcessor
         if ('#' === $pathItems[0]) {
             array_shift($pathItems);
         }
-        $ref = &$holder;
+        $ref = $holder;
         while (null !== $key = array_shift($pathItems)) {
             $key = urldecode($key);
             if ($ref instanceof \stdClass) {
-                if (property_exists($ref, $key)) {
-                    $ref = &$ref->$key;
+                $vars = get_object_vars($ref);
+                if (array_key_exists($key, $vars)) {
+                    $ref = $vars[$key];
                 } else {
                     throw new Exception('Key not found: ' . $key);
                 }
             } else {
                 if (array_key_exists($key, $ref)) {
-                    $ref = &$ref[$key];
+                    $ref = $ref[$key];
                 } else {
                     throw new Exception('Key not found: ' . $key);
                 }

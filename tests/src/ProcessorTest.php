@@ -29,5 +29,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         JsonProcessor::pushByPath($json, '#/l1/l2/1/1', 1);
 
         $this->assertSame('{"l1":{"l2":[[0],{"1":1}]}}', json_encode($json));
+
+        $this->assertSame(1, JsonProcessor::getByPath($json, '#/l1/l2/1/1'));
     }
 }
