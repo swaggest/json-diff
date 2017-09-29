@@ -155,8 +155,8 @@ class JsonDiff
             if ($original !== $new) {
                 $this->modifiedCnt++;
                 $this->modifiedPaths [] = $this->path;
-                $this->pushByPath($this->modifiedOriginal, $this->path, $original);
-                $this->pushByPath($this->modifiedNew, $this->path, $new);
+                JsonProcessor::pushByPath($this->modifiedOriginal, $this->path, $original);
+                JsonProcessor::pushByPath($this->modifiedNew, $this->path, $new);
             }
             return $new;
         }
@@ -183,7 +183,7 @@ class JsonDiff
             } else {
                 $this->removedCnt++;
                 $this->removedPaths [] = $this->path;
-                $this->pushByPath($this->removed, $this->path, $originalValue);
+                JsonProcessor::pushByPath($this->removed, $this->path, $originalValue);
             }
             $this->path = $path;
         }
@@ -192,7 +192,7 @@ class JsonDiff
         foreach ($newArray as $key => $value) {
             $newOrdered[$key] = $value;
             $path = $this->path . '/' . urlencode($key);
-            $this->pushByPath($this->added, $path, $value);
+            JsonProcessor::pushByPath($this->added, $path, $value);
             $this->addedCnt++;
             $this->addedPaths [] = $path;
         }
@@ -280,18 +280,5 @@ class JsonDiff
         }
 
         return $new;
-    }
-
-    private function pushByPath(&$holder, $path, $value)
-    {
-        $pathItems = explode('/', $path);
-        if ('#' === $pathItems[0]) {
-            array_shift($pathItems);
-        }
-        $ref = &$holder;
-        while (null !== $key = array_shift($pathItems)) {
-            $ref = &$ref[(string)$key];
-        }
-        $ref = $value;
     }
 }
