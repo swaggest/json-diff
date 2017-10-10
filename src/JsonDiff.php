@@ -223,6 +223,10 @@ class JsonDiff
                 if (!$item instanceof \stdClass) {
                     return $new;
                 }
+                if (!isset($item->$key)) {
+                    $keyIsUnique = false;
+                    break;
+                }
                 $value = $item->$key;
                 if ($value instanceof \stdClass || is_array($value)) {
                     $keyIsUnique = false;
