@@ -140,4 +140,48 @@ JSON;
 
     }
 
+
+    public function testNull()
+    {
+        $originalJson = <<<'JSON'
+{
+    "key2": 2,
+    "key3": null,
+    "key4": [
+        {"a":1, "b":true}, {"a":2, "b":false}, {"a":3}
+    ]
+}
+JSON;
+
+        $newJson = <<<'JSON'
+{
+    "key3": null
+}
+JSON;
+
+        $expected = <<<'JSON'
+{
+    "key2": 2,
+    "key4": [
+        {"a":1, "b":true}, {"a":2, "b":false}, {"a":3}
+    ]
+}
+JSON;
+
+        $r = new JsonDiff(json_decode($originalJson), json_decode($newJson));
+        $this->assertSame(array(
+            '#/key2',
+            '#/key4',
+        ), $r->getRemovedPaths());
+
+        $this->assertSame(2, $r->getRemovedCnt());
+
+        $this->assertSame(
+            json_encode(json_decode($expected), JSON_PRETTY_PRINT),
+            json_encode($r->getRemoved(), JSON_PRETTY_PRINT)
+        );
+
+    }
+
+
 }

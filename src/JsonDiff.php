@@ -177,7 +177,7 @@ class JsonDiff
             $path = $this->path;
             $this->path .= '/' . urlencode($key);
 
-            if (isset($newArray[$key])) {
+            if (array_key_exists($key, $newArray)) {
                 $newOrdered[$key] = $this->process($originalValue, $newArray[$key]);
                 unset($newArray[$key]);
             } else {
