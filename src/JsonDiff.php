@@ -5,6 +5,7 @@ namespace Swaggest\JsonDiff;
 class JsonDiff
 {
     const SKIP_REARRANGE_ARRAY = 1;
+    const STOP_ON_DIFF = 2;
 
     private $options = 0;
     private $original;
@@ -40,6 +41,15 @@ class JsonDiff
         $this->options = $options;
 
         $this->rearranged = $this->rearrange();
+    }
+
+    /**
+     * Returns total number of differences
+     * @return int
+     */
+    public function getDiffCnt()
+    {
+        return $this->addedCnt + $this->modifiedCnt + $this->removedCnt;
     }
 
     /**
@@ -157,6 +167,9 @@ class JsonDiff
                 $this->modifiedPaths [] = $this->path;
                 JsonProcessor::pushByPath($this->modifiedOriginal, $this->path, $original);
                 JsonProcessor::pushByPath($this->modifiedNew, $this->path, $new);
+                if ($this->options & self::STOP_ON_DIFF) {
+                    return;
+                }
             }
             return $new;
         }
@@ -184,6 +197,9 @@ class JsonDiff
                 $this->removedCnt++;
                 $this->removedPaths [] = $this->path;
                 JsonProcessor::pushByPath($this->removed, $this->path, $originalValue);
+                if ($this->options & self::STOP_ON_DIFF) {
+                    return;
+                }
             }
             $this->path = $path;
         }
@@ -195,6 +211,9 @@ class JsonDiff
             JsonProcessor::pushByPath($this->added, $path, $value);
             $this->addedCnt++;
             $this->addedPaths [] = $path;
+            if ($this->options & self::STOP_ON_DIFF) {
+                return;
+            }
         }
 
         return is_array($new) ? $newOrdered : (object)$newOrdered;
