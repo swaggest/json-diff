@@ -42,12 +42,12 @@ On construction `JsonDiff` will build `rearranged` value of `new` recursively ke
 Keys that are missing in `original` will be appended to the end of `rearranged` value in same order they had in `new` value.
 
 If two values are arrays of objects, `JsonDiff` will try to find a common unique field in those objects and use it as criteria for rearranging. 
-You can disable this behaviour with `JsonDiff::SKIP_REARRANGE_ARRAY` option:
+You can enable this behaviour with `JsonDiff::REARRANGE_ARRAYS` option:
 ```php
 $r = new JsonDiff(
     json_decode($originalJson), 
-    json_decode($newJson), 
-    JsonDiff::SKIP_REARRANGE_ARRAY
+    json_decode($newJson),
+    JsonDiff::REARRANGE_ARRAYS
 );
 ```
 
