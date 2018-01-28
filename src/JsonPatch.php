@@ -117,17 +117,17 @@ class JsonPatch implements \JsonSerializable
             $pathItems = JsonPointer::splitPath($operation->path);
             switch (true) {
                 case $operation instanceof Add:
-                    JsonPointer::add($original, $pathItems, $operation->value);
+                    JsonPointer::add($original, $pathItems, $operation->value, false);
                     break;
                 case $operation instanceof Copy:
                     $fromItems = JsonPointer::splitPath($operation->from);
                     $value = JsonPointer::get($original, $fromItems);
-                    JsonPointer::add($original, $pathItems, $value);
+                    JsonPointer::add($original, $pathItems, $value, false);
                     break;
                 case $operation instanceof Move:
                     $fromItems = JsonPointer::splitPath($operation->from);
                     $value = JsonPointer::get($original, $fromItems);
-                    JsonPointer::add($original, $pathItems, $value);
+                    JsonPointer::add($original, $pathItems, $value, false);
                     JsonPointer::remove($original, $fromItems);
                     break;
                 case $operation instanceof Remove:
@@ -135,14 +135,15 @@ class JsonPatch implements \JsonSerializable
                     break;
                 case $operation instanceof Replace:
                     JsonPointer::get($original, $pathItems);
-                    JsonPointer::add($original, $pathItems, $operation->value);
+                    JsonPointer::add($original, $pathItems, $operation->value, false);
                     break;
                 case $operation instanceof Test:
                     $value = JsonPointer::get($original, $pathItems);
                     $diff = new JsonDiff($operation->value, $value,
                         JsonDiff::STOP_ON_DIFF);
                     if ($diff->getDiffCnt() !== 0) {
-                        throw new Exception('Test operation ' . json_encode($operation) . ' failed: ' . json_encode($value));
+                        throw new Exception('Test operation ' . json_encode($operation, JSON_UNESCAPED_SLASHES)
+                            . ' failed: ' . json_encode($value));
                     }
                     break;
             }

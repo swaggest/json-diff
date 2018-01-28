@@ -31,7 +31,7 @@ class JsonPointer
         $result = array();
         if ($first === '#') {
             foreach ($pathItems as $key) {
-                $key = str_replace(array('~0', '~1'), array('~', '/'), urldecode($key));
+                $key = str_replace(array('~1', '~0'), array('/', '~'), urldecode($key));
                 $result[] = $key;
             }
         } else {
@@ -39,7 +39,7 @@ class JsonPointer
                 throw new Exception('Path must start with "/": ' . $path);
             }
             foreach ($pathItems as $key) {
-                $key = str_replace(array('~0', '~1'), array('~', '/'), $key);
+                $key = str_replace(array('~1', '~0'), array('/', '~'), $key);
                 $result[] = $key;
             }
         }
@@ -50,8 +50,10 @@ class JsonPointer
      * @param mixed $holder
      * @param string[] $pathItems
      * @param mixed $value
+     * @param bool $recursively
+     * @throws Exception
      */
-    public static function add(&$holder, $pathItems, $value)
+    public static function add(&$holder, $pathItems, $value, $recursively = true)
     {
         $ref = &$holder;
         while (null !== $key = array_shift($pathItems)) {
@@ -62,10 +64,18 @@ class JsonPointer
                 && false === filter_var($key, FILTER_VALIDATE_INT)
             ) {
                 $key = (string)$key;
-                $ref = new \stdClass();
-                $ref = &$ref->{$key};
+                if ($recursively) {
+                    $ref = new \stdClass();
+                    $ref = &$ref->{$key};
+                } else {
+                    throw new Exception('Non-existent path');
+                }
             } else {
-                $ref = &$ref[$key];
+                if ('-' === $key) {
+                    $ref = &$ref[];
+                } else {
+                    $ref = &$ref[$key];
+                }
             }
         }
         $ref = $value;
@@ -159,6 +169,7 @@ class JsonPointer
                 unset($parent->$refKey);
             } else {
                 unset($parent[$refKey]);
+                $parent = array_values($parent);
             }
         }
         return $ref;
