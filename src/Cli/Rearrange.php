@@ -5,12 +5,12 @@ namespace Swaggest\JsonDiff\Cli;
 
 use Yaoi\Command;
 
-class Diff extends Base
+class Rearrange extends Base
 {
     static function setUpDefinition(Command\Definition $definition, $options)
     {
         parent::setUpDefinition($definition, $options);
-        $definition->description = 'Make patch from two json documents, output to STDOUT';
+        $definition->description = 'Rearrange json document in the order of another (original) json document';
     }
 
 
@@ -21,8 +21,9 @@ class Diff extends Base
             return;
         }
 
-        $this->out = $this->diff->getPatch();
+        $this->out = $this->diff->getRearranged();
 
         $this->postPerform();
     }
+
 }

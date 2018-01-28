@@ -12,6 +12,7 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
  * To simplify changes review between two `JSON` files you can use a standard `diff` tool on rearranged pretty-printed `JSON`.
  * To detect breaking changes by analyzing removals and changes from original `JSON`.
  * To keep original order of object sets (for example `swagger.json` [parameters](https://swagger.io/docs/specification/describing-parameters/) list).
+ * To make and apply JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
 
 ## Installation
 
@@ -51,6 +52,9 @@ $r = new JsonDiff(
 ```
 
 On created object you have several handy methods.
+
+### `getPatch`
+Returns JsonPatch of difference
 
 ### `getRearranged`
 Returns new value, rearranged with original order.
@@ -98,7 +102,7 @@ $originalJson = <<<'JSON'
         "sub2": "b"
     },
     "key4": [
-        {"a":1, "b":true}, {"a":2, "b":false}, {"a":3}
+        {"a":1, "b":true, "subs": [{"s":1}, {"s":2}, {"s":3}]}, {"a":2, "b":false}, {"a":3}
     ]
 }
 JSON;
@@ -108,7 +112,7 @@ $newJson = <<<'JSON'
     "key5": "wat",
     "key1": [5, 1, 2, 3],
     "key4": [
-        {"c":false, "a":2}, {"a":1, "b":true}, {"c":1, "a":3}
+        {"c":false, "a":2}, {"a":1, "b":true, "subs": [{"s":3, "add": true}, {"s":2}, {"s":1}]}, {"c":1, "a":3}
     ],
     "key3": {
         "sub3": 0,
@@ -118,50 +122,42 @@ $newJson = <<<'JSON'
 }
 JSON;
 
-$expected = <<<'JSON'
-{
-    "key1": [5, 1, 2, 3],
-    "key3": {
-        "sub1": "c",
-        "sub2": false,
-        "sub3": 0
-    },
-    "key4": [
-        {"a":1, "b":true}, {"a":2, "c":false}, {"a":3, "c":1}
-    ],
-    "key5": "wat"
-}
+$patchJson = <<<'JSON'
+[
+    {"value":4,"op":"test","path":"/key1/0"},
+    {"value":5,"op":"replace","path":"/key1/0"},
+    
+    {"op":"remove","path":"/key2"},
+    
+    {"op":"remove","path":"/key3/sub0"},
+    
+    {"value":"a","op":"test","path":"/key3/sub1"},
+    {"value":"c","op":"replace","path":"/key3/sub1"},
+    
+    {"value":"b","op":"test","path":"/key3/sub2"},
+    {"value":false,"op":"replace","path":"/key3/sub2"},
+    
+    {"value":0,"op":"add","path":"/key3/sub3"},
+
+    {"value":true,"op":"add","path":"/key4/0/subs/2/add"},
+    
+    {"op":"remove","path":"/key4/1/b"},
+    
+    {"value":false,"op":"add","path":"/key4/1/c"},
+    
+    {"value":1,"op":"add","path":"/key4/2/c"},
+    
+    {"value":"wat","op":"add","path":"/key5"}
+]
 JSON;
 
-$r = new JsonDiff(json_decode($originalJson), json_decode($newJson));
-$this->assertSame(
-    json_encode(json_decode($expected), JSON_PRETTY_PRINT),
-    json_encode($r->getRearranged(), JSON_PRETTY_PRINT)
-);
-$this->assertSame('{"key3":{"sub3":0},"key4":{"1":{"c":false},"2":{"c":1}},"key5":"wat"}',
-    json_encode($r->getAdded()));
-$this->assertSame(array(
-    '#/key3/sub3',
-    '#/key4/1/c',
-    '#/key4/2/c',
-    '#/key5',
-), $r->getAddedPaths());
-$this->assertSame('{"key2":2,"key3":{"sub0":0},"key4":{"1":{"b":false}}}',
-    json_encode($r->getRemoved()));
-$this->assertSame(array(
-    '#/key2',
-    '#/key3/sub0',
-    '#/key4/1/b',
-), $r->getRemovedPaths());
+$diff = new JsonDiff(json_decode($originalJson), json_decode($newJson), JsonDiff::REARRANGE_ARRAYS);
+$this->assertEquals(json_decode($patchJson), $diff->getPatch()->jsonSerialize());
 
-$this->assertSame(array(
-    '#/key1/0',
-    '#/key3/sub1',
-    '#/key3/sub2',
-), $r->getModifiedPaths());
-
-$this->assertSame('{"key1":[4],"key3":{"sub1":"a","sub2":"b"}}', json_encode($r->getModifiedOriginal()));
-$this->assertSame('{"key1":[5],"key3":{"sub1":"c","sub2":false}}', json_encode($r->getModifiedNew()));
+$original = json_decode($originalJson);
+$patch = JsonPatch::import(json_decode($patchJson));
+$patch->apply($original);
+$this->assertEquals($diff->getRearranged(), $original);
 ```
 
 ## CLI tool
@@ -169,26 +165,74 @@ $this->assertSame('{"key1":[5],"key3":{"sub1":"c","sub2":false}}', json_encode($
 ### Usage
 
 ```
-json-diff --help
-v1.0.0 json-diff
-JSON diff and rearrange tool for PHP, https://github.com/swaggest/json-diff
+bin/json-diff --help
+JSON diff and apply tool for PHP, https://github.com/swaggest/json-diff
 Usage: 
-   json-diff <action> <originalPath> <newPath>
-   action         Action to perform                                                     
-                  Allowed values: rearrange, changes, removals, additions, modifications
-   originalPath   Path to old (original) json file                                      
-   newPath        Path to new json file                                                 
+   json-diff <action>
+   action   Action name                                 
+            Allowed values: diff, apply, rearrange, info
+```
+
+```
+bin/json-diff diff --help
+v2.0.0 json-diff diff
+JSON diff and apply tool for PHP, https://github.com/swaggest/json-diff
+Make patch from two json documents, output to STDOUT
+Usage: 
+   json-diff diff <originalPath> <newPath>
+   originalPath   Path to old (original) json file
+   newPath        Path to new json file           
    
 Options: 
-   --out <out>     Path to output result json file, STDOUT if not specified
-   --show-paths    Show JSON paths                                         
-   --show-json     Show JSON result                                        
+   --pretty              Pretty-print result JSON          
+   --rearrange-arrays    Rearrange arrays to match original     
+```
+
+```
+bin/json-diff apply --help
+v2.0.0 json-diff apply
+JSON diff and apply tool for PHP, https://github.com/swaggest/json-diff
+Apply patch to base json document, output to STDOUT
+Usage: 
+   json-diff apply [patchPath] [basePath]
+   patchPath   Path to JSON patch file
+   basePath    Path to JSON base file 
    
-Misc: 
-   --help               Show usage information    
-   --version            Show version              
-   --bash-completion    Generate bash completion  
-   --install            Install to /usr/local/bin/
+Options: 
+   --pretty              Pretty-print result JSON          
+   --rearrange-arrays    Rearrange arrays to match original
+```
+
+```
+bin/json-diff rearrange --help
+v2.0.0 json-diff rearrange
+JSON diff and apply tool for PHP, https://github.com/swaggest/json-diff
+Rearrange json document in the order of another (original) json document
+Usage: 
+   json-diff rearrange <originalPath> <newPath>
+   originalPath   Path to old (original) json file
+   newPath        Path to new json file           
+   
+Options: 
+   --pretty              Pretty-print result JSON          
+   --rearrange-arrays    Rearrange arrays to match original
+```
+
+```
+bin/json-diff info --help
+v2.0.0 json-diff info
+JSON diff and apply tool for PHP, https://github.com/swaggest/json-diff
+Show diff info for two JSON documents
+Usage: 
+   json-diff info <originalPath> <newPath>
+   originalPath   Path to old (original) json file
+   newPath        Path to new json file           
+   
+Options: 
+   --pretty              Pretty-print result JSON          
+   --rearrange-arrays    Rearrange arrays to match original
+   --with-contents       Add content to output             
+   --with-paths          Add paths to output               
 ```
 
 ### Examples
@@ -196,7 +240,7 @@ Misc:
 Using with standard `diff`
 
 ```
-json-diff rearrange ./composer.json ./composer2.json --show-json | diff ./composer.json -
+json-diff rearrange ./composer.json ./composer2.json | diff ./composer.json -
 3c3
 <     "description": "JSON diff and merge tool for PHP",
 ---
@@ -221,30 +265,29 @@ json-diff rearrange ./composer.json ./composer2.json --show-json | diff ./compos
 Showing differences in `JSON` mode
 
 ```
-bin/json-diff changes ./composer.json ./composer2.json --show-json --show-paths
-#/license
-#/authors
-#/bin
-#/description
+bin/json-diff info tests/assets/original.json tests/assets/new.json --with-paths --pretty
 {
-    "removals": {
-        "license": "MIT",
-        "authors": [
-            {
-                "name": "Viacheslav Poturaev",
-                "email": "vearutop@gmail.com"
-            }
-        ],
-        "bin": [
-            "bin/json-diff"
-        ]
-    },
-    "additions": null,
-    "modifiedOriginal": {
-        "description": "JSON diff and merge tool for PHP"
-    },
-    "modifiedNew": {
-        "description": "JSON diff and merge tool for PHPH"
-    }
+    "addedCnt": 4,
+    "modifiedCnt": 4,
+    "removedCnt": 3,
+    "addedPaths": [
+        "/key3/sub3",
+        "/key4/0/c",
+        "/key4/2/c",
+        "/key5"
+    ],
+    "modifiedPaths": [
+        "/key1/0",
+        "/key3/sub1",
+        "/key3/sub2",
+        "/key4/0/a",
+        "/key4/1/a",
+        "/key4/1/b"
+    ],
+    "removedPaths": [
+        "/key2",
+        "/key3/sub0",
+        "/key4/0/b"
+    ]
 }
 ```

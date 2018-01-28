@@ -2,10 +2,21 @@
 
 namespace Swaggest\JsonDiff;
 
+use Swaggest\JsonDiff\JsonPatch\Add;
+use Swaggest\JsonDiff\JsonPatch\Remove;
+use Swaggest\JsonDiff\JsonPatch\Replace;
+use Swaggest\JsonDiff\JsonPatch\Test;
+
 class JsonDiff
 {
-    const SKIP_REARRANGE_ARRAY = 1;
+    const REARRANGE_ARRAYS = 1;
     const STOP_ON_DIFF = 2;
+
+    /**
+     * Use URI Fragment Identifier Representation will be used (example: "#/c%25d").
+     * If not set default JSON String Representation (example: "/c%d").
+     */
+    const JSON_URI_FRAGMENT_ID = 4;
 
     private $options = 0;
     private $original;
@@ -24,9 +35,13 @@ class JsonDiff
     private $modifiedCnt = 0;
     private $modifiedPaths = array();
 
-    private $path = '#';
+    private $path = '';
+    private $pathItems = array();
 
     private $rearranged;
+
+    /** @var JsonPatch */
+    private $jsonPatch;
 
     /**
      * Processor constructor.
@@ -36,9 +51,15 @@ class JsonDiff
      */
     public function __construct($original, $new, $options = 0)
     {
+        $this->jsonPatch = new JsonPatch();
+
         $this->original = $original;
         $this->new = $new;
         $this->options = $options;
+
+        if ($options & self::JSON_URI_FRAGMENT_ID) {
+            $this->path = '#';
+        }
 
         $this->rearranged = $this->rearrange();
     }
@@ -151,6 +172,15 @@ class JsonDiff
         return $this->rearranged;
     }
 
+    /**
+     * Returns JsonPatch of difference
+     * @return JsonPatch
+     */
+    public function getPatch()
+    {
+        return $this->jsonPatch;
+    }
+
     private function rearrange()
     {
         return $this->process($this->original, $this->new);
@@ -165,17 +195,22 @@ class JsonDiff
             if ($original !== $new) {
                 $this->modifiedCnt++;
                 $this->modifiedPaths [] = $this->path;
-                JsonProcessor::pushByPath($this->modifiedOriginal, $this->path, $original);
-                JsonProcessor::pushByPath($this->modifiedNew, $this->path, $new);
+
+                $this->jsonPatch->op(new Test($this->path, $original));
+                $this->jsonPatch->op(new Replace($this->path, $new));
+
+                JsonPointer::add($this->modifiedOriginal, $this->pathItems, $original);
+                JsonPointer::add($this->modifiedNew, $this->pathItems, $new);
+
                 if ($this->options & self::STOP_ON_DIFF) {
-                    return;
+                    return null;
                 }
             }
             return $new;
         }
 
         if (
-            !($this->options & self::SKIP_REARRANGE_ARRAY)
+            ($this->options & self::REARRANGE_ARRAYS)
             && is_array($original) && is_array($new)
         ) {
             $new = $this->rearrangeArray($original, $new);
@@ -188,7 +223,9 @@ class JsonDiff
 
         foreach ($originalKeys as $key => $originalValue) {
             $path = $this->path;
-            $this->path .= '/' . urlencode($key);
+            $pathItems = $this->pathItems;
+            $this->path .= '/' . JsonPointer::escapeSegment($key, $this->options & self::JSON_URI_FRAGMENT_ID);
+            $this->pathItems[] = $key;
 
             if (array_key_exists($key, $newArray)) {
                 $newOrdered[$key] = $this->process($originalValue, $newArray[$key]);
@@ -196,23 +233,32 @@ class JsonDiff
             } else {
                 $this->removedCnt++;
                 $this->removedPaths [] = $this->path;
-                JsonProcessor::pushByPath($this->removed, $this->path, $originalValue);
+
+                $this->jsonPatch->op(new Remove($this->path));
+
+                JsonPointer::add($this->removed, $this->pathItems, $originalValue);
                 if ($this->options & self::STOP_ON_DIFF) {
-                    return;
+                    return null;
                 }
             }
             $this->path = $path;
+            $this->pathItems = $pathItems;
         }
 
         // additions
         foreach ($newArray as $key => $value) {
             $newOrdered[$key] = $value;
-            $path = $this->path . '/' . urlencode($key);
-            JsonProcessor::pushByPath($this->added, $path, $value);
+            $path = $this->path . '/' . JsonPointer::escapeSegment($key, $this->options & self::JSON_URI_FRAGMENT_ID);
+            $pathItems = $this->pathItems;
+            $pathItems[] = $key;
+            JsonPointer::add($this->added, $pathItems, $value);
             $this->addedCnt++;
             $this->addedPaths [] = $path;
+
+            $this->jsonPatch->op(new Add($path, $value));
+
             if ($this->options & self::STOP_ON_DIFF) {
-                return;
+                return null;
             }
         }
 

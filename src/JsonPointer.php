@@ -3,19 +3,58 @@
 namespace Swaggest\JsonDiff;
 
 
-class JsonProcessor
+class JsonPointer
 {
-    public static function pushByPath(&$holder, $path, $value)
+    /**
+     * @param string $key
+     * @param bool $isURIFragmentId
+     * @return string
+     */
+    public static function escapeSegment($key, $isURIFragmentId = false)
+    {
+        if ($isURIFragmentId) {
+            return str_replace(array('%2F', '%7E'), array('~0', '~1'), urlencode($key));
+        } else {
+            return str_replace(array('~', '/'), array('~0', '~1'), $key);
+        }
+    }
+
+    /**
+     * @param string $path
+     * @return string[]
+     * @throws Exception
+     */
+    public static function splitPath($path)
     {
         $pathItems = explode('/', $path);
-        if ('#' === $pathItems[0]) {
-            array_shift($pathItems);
+        $first = array_shift($pathItems);
+        $result = array();
+        if ($first === '#') {
+            foreach ($pathItems as $key) {
+                $key = str_replace(array('~0', '~1'), array('~', '/'), urldecode($key));
+                $result[] = $key;
+            }
+        } else {
+            if ($first !== '') {
+                throw new Exception('Path must start with "/": ' . $path);
+            }
+            foreach ($pathItems as $key) {
+                $key = str_replace(array('~0', '~1'), array('~', '/'), $key);
+                $result[] = $key;
+            }
         }
+        return $result;
+    }
+
+    /**
+     * @param mixed $holder
+     * @param string[] $pathItems
+     * @param mixed $value
+     */
+    public static function add(&$holder, $pathItems, $value)
+    {
         $ref = &$holder;
         while (null !== $key = array_shift($pathItems)) {
-            if (is_string($key)) {
-                $key = urldecode($key);
-            }
             if ($ref instanceof \stdClass) {
                 $ref = &$ref->$key;
             } elseif ($ref === null
@@ -58,15 +97,16 @@ class JsonProcessor
     }
 
 
-    public static function getByPath($holder, $path)
+    /**
+     * @param mixed $holder
+     * @param string[] $pathItems
+     * @return bool|mixed
+     * @throws Exception
+     */
+    public static function get($holder, $pathItems)
     {
-        $pathItems = explode('/', $path);
-        if ('#' === $pathItems[0]) {
-            array_shift($pathItems);
-        }
         $ref = $holder;
         while (null !== $key = array_shift($pathItems)) {
-            $key = urldecode($key);
             if ($ref instanceof \stdClass) {
                 $vars = (array)$ref;
                 if (self::arrayKeyExists($key, $vars)) {
@@ -74,27 +114,30 @@ class JsonProcessor
                 } else {
                     throw new Exception('Key not found: ' . $key);
                 }
-            } else {
+            } elseif (is_array($ref)) {
                 if (self::arrayKeyExists($key, $ref)) {
                     $ref = $ref[$key];
                 } else {
                     throw new Exception('Key not found: ' . $key);
                 }
+            } else {
+                throw new Exception('Key not found: ' . $key);
             }
         }
         return $ref;
     }
 
-    public static function removeByPath(&$holder, $path)
+    /**
+     * @param mixed $holder
+     * @param string[] $pathItems
+     * @return mixed
+     * @throws Exception
+     */
+    public static function remove(&$holder, $pathItems)
     {
-        $pathItems = explode('/', $path);
-        if ('#' === $pathItems[0]) {
-            array_shift($pathItems);
-        }
         $ref = &$holder;
         while (null !== $key = array_shift($pathItems)) {
             $parent = &$ref;
-            $key = urldecode($key);
             $refKey = $key;
             if ($ref instanceof \stdClass) {
                 if (property_exists($ref, $key)) {

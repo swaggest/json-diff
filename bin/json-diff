@@ -9,4 +9,4 @@ foreach (array(__DIR__ . '/../../../autoload.php', __DIR__ . '/../vendor/autoloa
     }
 }
 
-\Yaoi\Cli\Command\Runner::create(new \Swaggest\JsonDiff\Cli\Diff())->run();
+\Yaoi\Cli\Command\Application\Runner::create(new \Swaggest\JsonDiff\Cli\App())->run();
