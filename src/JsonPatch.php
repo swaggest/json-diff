@@ -127,8 +127,8 @@ class JsonPatch implements \JsonSerializable
                 case $operation instanceof Move:
                     $fromItems = JsonPointer::splitPath($operation->from);
                     $value = JsonPointer::get($original, $fromItems);
-                    JsonPointer::add($original, $pathItems, $value, false);
                     JsonPointer::remove($original, $fromItems);
+                    JsonPointer::add($original, $pathItems, $value, false);
                     break;
                 case $operation instanceof Remove:
                     JsonPointer::remove($original, $pathItems);

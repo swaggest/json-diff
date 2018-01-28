@@ -74,6 +74,14 @@ class JsonPointer
                 if ('-' === $key) {
                     $ref = &$ref[];
                 } else {
+                    if (!is_array($ref)) {
+                        throw new Exception('Check me!!');
+                    }
+
+                    $key = (int)$key;
+                    if (is_array($ref) && array_key_exists($key, $ref)) {
+                        array_splice($ref, $key, 0, array($value));
+                    }
                     $ref = &$ref[$key];
                 }
             }
