@@ -45,8 +45,8 @@ class JsonDiff
 
     /**
      * Processor constructor.
-     * @param $original
-     * @param $new
+     * @param mixed $original
+     * @param mixed $new
      * @param int $options
      */
     public function __construct($original, $new, $options = 0)

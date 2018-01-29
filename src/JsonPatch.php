@@ -108,7 +108,7 @@ class JsonPatch implements \JsonSerializable
     }
 
     /**
-     * @param $original
+     * @param mixed $original
      * @throws Exception
      */
     public function apply(&$original)
@@ -135,6 +135,7 @@ class JsonPatch implements \JsonSerializable
                     break;
                 case $operation instanceof Replace:
                     JsonPointer::get($original, $pathItems);
+                    JsonPointer::remove($original, $pathItems);
                     JsonPointer::add($original, $pathItems, $operation->value, false);
                     break;
                 case $operation instanceof Test:

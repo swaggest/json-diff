@@ -55,6 +55,7 @@ class JsonPointer
      */
     public static function add(&$holder, $pathItems, $value, $recursively = true)
     {
+        $pp = $pathItems;
         $ref = &$holder;
         while (null !== $key = array_shift($pathItems)) {
             if ($ref instanceof \stdClass) {
@@ -71,15 +72,15 @@ class JsonPointer
                     throw new Exception('Non-existent path');
                 }
             } else {
+                if ($recursively && $ref === null) {
+                    $ref = array();
+                }
+
                 if ('-' === $key) {
                     $ref = &$ref[];
                 } else {
-                    if (!is_array($ref)) {
-                        throw new Exception('Check me!!');
-                    }
-
                     $key = (int)$key;
-                    if (is_array($ref) && array_key_exists($key, $ref)) {
+                    if (is_array($ref) && array_key_exists($key, $ref) && !$pathItems) {
                         array_splice($ref, $key, 0, array($value));
                     }
                     $ref = &$ref[$key];
