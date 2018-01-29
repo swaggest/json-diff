@@ -85,6 +85,10 @@ class SpecTest extends \PHPUnit_Framework_TestCase
                     . "\n" . json_encode($doc, $jsonOptions));
             }
         } catch (Exception $e) {
+            if ($e->getCode() === Exception::EMPTY_PROPERTY_NAME_UNSUPPORTED) {
+                $this->markTestSkipped('Empty property name unsupported in PHP <7.1');
+            }
+
             if ($error === null) {
                 $this->fail($e->getMessage()
                     . "\n" . json_encode($case, $jsonOptions));
