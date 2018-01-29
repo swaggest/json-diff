@@ -75,6 +75,7 @@ JSON;
 
         $diff = new JsonDiff(json_decode($originalJson), json_decode($newJson), JsonDiff::REARRANGE_ARRAYS);
         $this->assertEquals(json_decode($patchJson), $diff->getPatch()->jsonSerialize());
+        $this->assertSame(3, $diff->getModifiedCnt());
 
         $original = json_decode($originalJson);
         $patch = JsonPatch::import(json_decode($patchJson));

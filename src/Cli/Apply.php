@@ -49,10 +49,10 @@ class Apply extends Base
             $patch = JsonPatch::import(json_decode($patchJson));
             $base = json_decode($baseJson);
             $patch->apply($base);
+            $this->out = $base;
         } catch (Exception $e) {
             $this->response->error($e->getMessage());
         }
-        $this->out = $base;
 
         $this->postPerform();
     }
