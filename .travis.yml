@@ -36,7 +36,7 @@ matrix:
 
 script:
   - ./vendor/bin/phpunit -v --configuration phpunit.xml --coverage-text --coverage-clover clover.xml
-  - if [[ $(phpenv version-name) =~ 7.2 ]] ; then php $HOME/.composer/cache/phpstan.phar analyze -l 7 -c phpstan.neon ./src; fi
+  - if [[ $(phpenv version-name) =~ 7.2 ]] ; then php $HOME/.composer/cache/phpstan.phar analyze -l 7 ./src; fi
 
 after_script:
  - if [[ $(phpenv version-name) =~ 7.2 ]] ; then php $HOME/.composer/cache/ocular.phar code-coverage:upload --format=php-clover clover.xml; fi

@@ -55,7 +55,6 @@ class JsonPointer
      */
     public static function add(&$holder, $pathItems, $value, $recursively = true)
     {
-        $pp = $pathItems;
         $ref = &$holder;
         while (null !== $key = array_shift($pathItems)) {
             if ($ref instanceof \stdClass) {
