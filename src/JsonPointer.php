@@ -136,6 +136,11 @@ class JsonPointer
         $ref = $holder;
         while (null !== $key = array_shift($pathItems)) {
             if ($ref instanceof \stdClass) {
+                if (PHP_VERSION_ID < 71000 && '' === $key) {
+                    throw new Exception('Empty property name is not supported by PHP <7.1',
+                        Exception::EMPTY_PROPERTY_NAME_UNSUPPORTED);
+                }
+
                 $vars = (array)$ref;
                 if (self::arrayKeyExists($key, $vars)) {
                     $ref = self::arrayGet($key, $vars);
