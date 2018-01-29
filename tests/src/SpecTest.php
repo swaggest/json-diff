@@ -5,43 +5,49 @@ namespace Swaggest\JsonDiff\Tests;
 use Swaggest\JsonDiff\Exception;
 use Swaggest\JsonDiff\JsonPatch;
 
+/**
+ * @see https://github.com/json-patch/json-patch-tests
+ */
 class SpecTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider specProvider
+     * @dataProvider specTestsProvider
      */
-    public function testSpec($case)
+    public function testSpecTests($case)
     {
-        $comment = $case->comment;
-        $doc = clone $case->doc;
-        $patch = $case->patch;
-        $expected = isset($case->expected) ? $case->expected : null;
-        $error = isset($case->error) ? $case->error : null;
-
-        try {
-            $patch = JsonPatch::import($patch);
-            $patch->apply($doc);
-            if ($error !== null) {
-                $this->fail('Error expected: ' . $error
-                    . "\n" . json_encode($case, JSON_UNESCAPED_SLASHES + JSON_PRETTY_PRINT));
-            }
-            $this->assertEquals($expected, $doc, json_encode($case, JSON_UNESCAPED_SLASHES + JSON_PRETTY_PRINT));
-        } catch (Exception $e) {
-            $hasException = true;
-            if ($error === null) {
-                $this->fail($e->getMessage()
-                    . "\n" . json_encode($case, JSON_UNESCAPED_SLASHES + JSON_PRETTY_PRINT));
-            }
-        }
+        $this->doTest($case);
     }
 
-    public function specProvider()
+    /**
+     * @dataProvider testsProvider
+     */
+    public function testTests($case)
     {
-        $cases = json_decode(file_get_contents(__DIR__ . '/../assets/spec-tests.json'));
+        $this->doTest($case);
+    }
+
+
+    public function testsProvider()
+    {
+        return $this->provider(__DIR__ . '/../assets/tests.json');
+    }
+
+    public function specTestsProvider()
+    {
+        return $this->provider(__DIR__ . '/../assets/spec-tests.json');
+    }
+
+    protected function provider($path)
+    {
+        $cases = json_decode(file_get_contents($path));
 
         $testCases = array();
-        foreach ($cases as $case) {
-            $comment = $case->comment;
+        foreach ($cases as $i => $case) {
+            if (!isset($case->comment)) {
+                $comment = 'unknown' . $i;
+            } else {
+                $comment = $case->comment;
+            }
 
             $testCases[$comment] = array(
                 'case' => $case,
@@ -50,5 +56,40 @@ class SpecTest extends \PHPUnit_Framework_TestCase
         return $testCases;
     }
 
+    protected function doTest($case) {
+        if (isset($case->disabled) && $case->disabled) {
+            $this->markTestSkipped('test is disabled');
+            return;
+        }
+
+        if (!is_object($case->doc)) {
+            $doc = $case->doc;
+        } else {
+            $doc = clone $case->doc;
+        }
+        $patch = $case->patch;
+        $hasExpected = array_key_exists('expected', (array)$case);
+        $expected = isset($case->expected) ? $case->expected : null;
+        $error = isset($case->error) ? $case->error : null;
+        $jsonOptions = JSON_UNESCAPED_SLASHES + JSON_PRETTY_PRINT;
+
+        try {
+            $patch = JsonPatch::import($patch);
+            $patch->apply($doc);
+            if ($error !== null) {
+                $this->fail('Error expected: ' . $error
+                    . "\n" . json_encode($case, $jsonOptions));
+            }
+            if ($hasExpected) {
+                $this->assertEquals($expected, $doc, json_encode($case, $jsonOptions)
+                    . "\n" . json_encode($doc, $jsonOptions));
+            }
+        } catch (Exception $e) {
+            if ($error === null) {
+                $this->fail($e->getMessage()
+                    . "\n" . json_encode($case, $jsonOptions));
+            }
+        }
+    }
 
 }

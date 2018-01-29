@@ -59,23 +59,35 @@ class JsonPointer
         while (null !== $key = array_shift($pathItems)) {
             if ($ref instanceof \stdClass) {
                 $ref = &$ref->$key;
-            } elseif ($ref === null && false === filter_var($key, FILTER_VALIDATE_INT)) {
-                $key = (string)$key;
-                if ($recursively) {
-                    $ref = new \stdClass();
-                    $ref = &$ref->{$key};
-                } else {
-                    throw new Exception('Non-existent path');
-                }
-            } else {
-                if ($recursively && $ref === null) $ref = array();
-                if ('-' === $key) {
-                    $ref = &$ref[];
-                } else {
-                    if (is_array($ref) && array_key_exists($key, $ref) && empty($pathItems)) {
-                        array_splice($ref, $key, 0, array($value));
+            } else { // null or array
+                $intKey = filter_var($key, FILTER_VALIDATE_INT);
+                if ($ref === null && (false === $intKey || $intKey !== 0)) {
+                    $key = (string)$key;
+                    if ($recursively) {
+                        $ref = new \stdClass();
+                        $ref = &$ref->{$key};
+                    } else {
+                        throw new Exception('Non-existent path');
                     }
-                    $ref = &$ref[$key];
+                } else {
+                    if ($recursively && $ref === null) $ref = array();
+                    if ('-' === $key) {
+                        $ref = &$ref[];
+                    } else {
+                        if (is_array($ref) && array_key_exists($key, $ref) && empty($pathItems)) {
+                            array_splice($ref, $key, 0, array($value));
+                        }
+                        if (false === $intKey) {
+                            throw new Exception('Invalid key for array operation');
+                        }
+                        if ($intKey > count($ref) && !$recursively) {
+                            throw new Exception('Index is greater than number of items in array');
+                        } elseif ($intKey < 0) {
+                            throw new Exception('Negative index');
+                        }
+
+                        $ref = &$ref[$intKey];
+                    }
                 }
             }
         }

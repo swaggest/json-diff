@@ -7,6 +7,9 @@ use Swaggest\JsonDiff\JsonDiff;
 
 class RearrangeArrayTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @throws \Swaggest\JsonDiff\Exception
+     */
     public function testRearrangeArray()
     {
         $oldJson = <<<'JSON'
@@ -123,6 +126,11 @@ JSON;
 
         $m = new JsonDiff(json_decode($oldJson), json_decode($newJson), JsonDiff::REARRANGE_ARRAYS);
         $this->assertSame($expectedJson, json_encode($m->getRearranged(), JSON_PRETTY_PRINT));
+    }
+
+    public function testRearrangeNoUnique()
+    {
+
     }
 
 }
