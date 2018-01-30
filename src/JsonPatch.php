@@ -27,11 +27,8 @@ class JsonPatch implements \JsonSerializable
      * @return JsonPatch
      * @throws Exception
      */
-    public static function import($data)
+    public static function import(array $data)
     {
-        if (!is_array($data)) {
-            throw new Exception('Array expected in JsonPatch::import');
-        }
         $result = new JsonPatch();
         foreach ($data as $operation) {
             /** @var OpPath|OpPathValue|OpPathFrom $operation */

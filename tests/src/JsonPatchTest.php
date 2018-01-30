@@ -75,7 +75,8 @@ JSON;
 
     public function testInvalidPatch()
     {
-        $this->setExpectedException(get_class(new Exception()), 'Array expected in JsonPatch::import');
+        $this->setExpectedException(get_class(new \TypeError()),
+            'Argument 1 passed to Swaggest\JsonDiff\JsonPatch::import() must be of the type array, integer given');
         JsonPatch::import(123);
     }
 

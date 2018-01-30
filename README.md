@@ -5,7 +5,7 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
 [![Build Status](https://travis-ci.org/swaggest/json-diff.svg?branch=master)](https://travis-ci.org/swaggest/json-diff)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/swaggest/json-diff/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/swaggest/json-diff/?branch=master)
 [![Code Climate](https://codeclimate.com/github/swaggest/json-diff/badges/gpa.svg)](https://codeclimate.com/github/swaggest/json-diff)
-[![Test Coverage](https://codeclimate.com/github/swaggest/json-diff/badges/coverage.svg)](https://codeclimate.com/github/swaggest/json-diff/coverage)
+[![Code Coverage](https://scrutinizer-ci.com/g/swaggest/json-diff/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/swaggest/json-diff/code-structure/master/code-coverage)
 
 ## Purpose
 
@@ -54,7 +54,7 @@ $r = new JsonDiff(
 On created object you have several handy methods.
 
 ### `getPatch`
-Returns JsonPatch of difference
+Returns `JsonPatch` of difference
 
 ### `getRearranged`
 Returns new value, rearranged with original order.

@@ -7,7 +7,7 @@ use Yaoi\Command;
 
 class Diff extends Base
 {
-    static function setUpDefinition(Command\Definition $definition, $options)
+    public static function setUpDefinition(Command\Definition $definition, $options)
     {
         parent::setUpDefinition($definition, $options);
         $definition->description = 'Make patch from two json documents, output to STDOUT';
