@@ -7,7 +7,7 @@ use Yaoi\Command;
 
 class Rearrange extends Base
 {
-    static function setUpDefinition(Command\Definition $definition, $options)
+    public static function setUpDefinition(Command\Definition $definition, $options)
     {
         parent::setUpDefinition($definition, $options);
         $definition->description = 'Rearrange json document in the order of another (original) json document';

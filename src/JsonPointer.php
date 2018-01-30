@@ -28,20 +28,30 @@ class JsonPointer
     {
         $pathItems = explode('/', $path);
         $first = array_shift($pathItems);
-        $result = array();
         if ($first === '#') {
-            foreach ($pathItems as $key) {
-                $key = str_replace(array('~1', '~0'), array('/', '~'), urldecode($key));
-                $result[] = $key;
-            }
+            return self::splitPathURIFragment($pathItems);
         } else {
             if ($first !== '') {
                 throw new Exception('Path must start with "/": ' . $path);
             }
-            foreach ($pathItems as $key) {
-                $key = str_replace(array('~1', '~0'), array('/', '~'), $key);
-                $result[] = $key;
-            }
+            return self::splitPathJsonString($pathItems);
+        }
+    }
+
+    private static function splitPathURIFragment(array $pathItems) {
+        $result = array();
+        foreach ($pathItems as $key) {
+            $key = str_replace(array('~1', '~0'), array('/', '~'), urldecode($key));
+            $result[] = $key;
+        }
+        return $result;
+    }
+
+    private static function splitPathJsonString(array $pathItems) {
+        $result = array();
+        foreach ($pathItems as $key) {
+            $key = str_replace(array('~1', '~0'), array('/', '~'), $key);
+            $result[] = $key;
         }
         return $result;
     }

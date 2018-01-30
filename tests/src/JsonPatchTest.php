@@ -72,13 +72,6 @@ JSON;
 
     }
 
-
-    public function testInvalidPatch()
-    {
-        $this->setExpectedException(get_class(new Exception()), 'Array expected in JsonPatch::import');
-        JsonPatch::import(123);
-    }
-
     public function testMissingOp()
     {
         $this->setExpectedException(get_class(new Exception()), 'Missing "op" in operation data');
