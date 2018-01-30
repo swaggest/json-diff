@@ -72,14 +72,6 @@ JSON;
 
     }
 
-
-    public function testInvalidPatch()
-    {
-        $this->setExpectedException(get_class(new \TypeError()),
-            'Argument 1 passed to Swaggest\JsonDiff\JsonPatch::import() must be of the type array, integer given');
-        JsonPatch::import(123);
-    }
-
     public function testMissingOp()
     {
         $this->setExpectedException(get_class(new Exception()), 'Missing "op" in operation data');
