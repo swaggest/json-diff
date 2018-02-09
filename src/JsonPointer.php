@@ -159,6 +159,9 @@ class JsonPointer
                 unset($parent->$refKey);
             } else {
                 unset($parent[$refKey]);
+                if ($refKey !== count($parent)) {
+                    $parent = array_values($parent);
+                }
             }
         }
         return $ref;

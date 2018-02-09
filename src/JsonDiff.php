@@ -220,12 +220,18 @@ class JsonDiff
         $newOrdered = array();
 
         $originalKeys = $original instanceof \stdClass ? get_object_vars($original) : $original;
+        $isArray = is_array($original);
+        $removedOffset = 0;
 
         foreach ($originalKeys as $key => $originalValue) {
             $path = $this->path;
             $pathItems = $this->pathItems;
-            $this->path .= '/' . JsonPointer::escapeSegment($key, $this->options & self::JSON_URI_FRAGMENT_ID);
-            $this->pathItems[] = $key;
+            $actualKey = $key;
+            if ($isArray) {
+                $actualKey -= $removedOffset;
+            }
+            $this->path .= '/' . JsonPointer::escapeSegment($actualKey, $this->options & self::JSON_URI_FRAGMENT_ID);
+            $this->pathItems[] = $actualKey;
 
             if (array_key_exists($key, $newArray)) {
                 $newOrdered[$key] = $this->process($originalValue, $newArray[$key]);
@@ -233,6 +239,9 @@ class JsonDiff
             } else {
                 $this->removedCnt++;
                 $this->removedPaths [] = $this->path;
+                if ($isArray) {
+                    $removedOffset++;
+                }
 
                 $this->jsonPatch->op(new Remove($this->path));
 

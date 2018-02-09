@@ -11,7 +11,7 @@ use Swaggest\JsonDiff\JsonPatch;
  */
 class Issue6Test extends \PHPUnit_Framework_TestCase
 {
-    public function testIssue6()
+    public function testDefault()
     {
         $json1 = json_decode('[{"name":"a"},{"name":"b"},{"name":"c"}]');
         $json2 = json_decode('[{"name":"b"}]');
@@ -37,7 +37,7 @@ class Issue6Test extends \PHPUnit_Framework_TestCase
     },
     {
         "op": "remove",
-        "path": "/2"
+        "path": "/1"
     }
 ]
 JSON
@@ -49,21 +49,42 @@ JSON
         $this->assertEquals($json2, $json1a);
     }
 
+    public function testOriginal()
+    {
+        $originalJson = '[{"name":"a"},{"name":"b"},{"name":"c"}]';
+        $newJson = '[{"name":"b"}]';
+        $diff = new JsonDiff(json_decode($originalJson), json_decode($newJson));
 
-    public function testIssue6Remove()
+        $patchJson = json_decode(json_encode($diff->getPatch()->jsonSerialize()), true);
+
+        $original = json_decode($originalJson);
+        $patch = JsonPatch::import($patchJson);
+        $patch->apply($original);
+        $this->assertEquals($original, json_decode($newJson));
+    }
+
+
+    public function testDoubleInverseRemove()
     {
         $json1 = json_decode('[{"name":"a"},{"name":"b"},{"name":"c"}]');
         $json2 = json_decode('[{"name":"b"}]');
 
-        $patch = JsonPatch::import(json_decode('[{"op":"remove","path":"/0"},{"op":"remove","path":"/2"}]'));
+        $patch = JsonPatch::import(json_decode('[{"op":"remove","path":"/2"},{"op":"remove","path":"/0"}]'));
 
         $json1a = $json1;
         $patch->apply($json1a);
         $this->assertEquals(json_encode($json2), json_encode($json1a));
-        /*
-            Failed asserting that two strings are equal.
-            Expected :'[{"name":"b"}]'
-            Actual   :'{"1":{"name":"b"}}'
-         */
+    }
+
+    public function testDoubleRemove()
+    {
+        $json1 = json_decode('[{"name":"a"},{"name":"b"},{"name":"c"}]');
+        $json2 = json_decode('[{"name":"b"}]');
+
+        $patch = JsonPatch::import(json_decode('[{"op":"remove","path":"/0"},{"op":"remove","path":"/1"}]'));
+
+        $json1a = $json1;
+        $patch->apply($json1a);
+        $this->assertEquals(json_encode($json2), json_encode($json1a));
     }
 }
