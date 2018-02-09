@@ -3,6 +3,7 @@
 namespace Swaggest\JsonDiff\Cli;
 
 
+use Swaggest\JsonDiff\Exception;
 use Swaggest\JsonDiff\JsonDiff;
 use Yaoi\Command;
 
@@ -48,7 +49,12 @@ abstract class Base extends Command
         if ($this->rearrangeArrays) {
             $options += JsonDiff::REARRANGE_ARRAYS;
         }
-        $this->diff = new JsonDiff(json_decode($originalJson), json_decode($newJson), $options);
+        try {
+            $this->diff = new JsonDiff(json_decode($originalJson), json_decode($newJson), $options);
+        } catch (Exception $e) {
+            $this->response->error($e->getMessage());
+            return;
+        }
 
         $this->out = '';
     }

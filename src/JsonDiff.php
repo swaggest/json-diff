@@ -45,9 +45,10 @@ class JsonDiff
 
     /**
      * Processor constructor.
-     * @param $original
-     * @param $new
+     * @param mixed $original
+     * @param mixed $new
      * @param int $options
+     * @throws Exception
      */
     public function __construct($original, $new, $options = 0)
     {
@@ -181,11 +182,21 @@ class JsonDiff
         return $this->jsonPatch;
     }
 
+    /**
+     * @return array|null|object|\stdClass
+     * @throws Exception
+     */
     private function rearrange()
     {
         return $this->process($this->original, $this->new);
     }
 
+    /**
+     * @param mixed $original
+     * @param mixed $new
+     * @return array|null|object|\stdClass
+     * @throws Exception
+     */
     private function process($original, $new)
     {
         if (
@@ -194,6 +205,9 @@ class JsonDiff
         ) {
             if ($original !== $new) {
                 $this->modifiedCnt++;
+                if ($this->options & self::STOP_ON_DIFF) {
+                    return null;
+                }
                 $this->modifiedPaths [] = $this->path;
 
                 $this->jsonPatch->op(new Test($this->path, $original));
@@ -202,9 +216,6 @@ class JsonDiff
                 JsonPointer::add($this->modifiedOriginal, $this->pathItems, $original);
                 JsonPointer::add($this->modifiedNew, $this->pathItems, $new);
 
-                if ($this->options & self::STOP_ON_DIFF) {
-                    return null;
-                }
             }
             return $new;
         }
@@ -224,6 +235,12 @@ class JsonDiff
         $removedOffset = 0;
 
         foreach ($originalKeys as $key => $originalValue) {
+            if ($this->options & self::STOP_ON_DIFF) {
+                if ($this->modifiedCnt || $this->addedCnt || $this->removedCnt) {
+                    return null;
+                }
+            }
+
             $path = $this->path;
             $pathItems = $this->pathItems;
             $actualKey = $key;
@@ -238,6 +255,9 @@ class JsonDiff
                 unset($newArray[$key]);
             } else {
                 $this->removedCnt++;
+                if ($this->options & self::STOP_ON_DIFF) {
+                    return null;
+                }
                 $this->removedPaths [] = $this->path;
                 if ($isArray) {
                     $removedOffset++;
@@ -246,9 +266,6 @@ class JsonDiff
                 $this->jsonPatch->op(new Remove($this->path));
 
                 JsonPointer::add($this->removed, $this->pathItems, $originalValue);
-                if ($this->options & self::STOP_ON_DIFF) {
-                    return null;
-                }
             }
             $this->path = $path;
             $this->pathItems = $pathItems;
@@ -256,19 +273,19 @@ class JsonDiff
 
         // additions
         foreach ($newArray as $key => $value) {
+            $this->addedCnt++;
+            if ($this->options & self::STOP_ON_DIFF) {
+                return null;
+            }
             $newOrdered[$key] = $value;
             $path = $this->path . '/' . JsonPointer::escapeSegment($key, $this->options & self::JSON_URI_FRAGMENT_ID);
             $pathItems = $this->pathItems;
             $pathItems[] = $key;
             JsonPointer::add($this->added, $pathItems, $value);
-            $this->addedCnt++;
             $this->addedPaths [] = $path;
 
             $this->jsonPatch->op(new Add($path, $value));
 
-            if ($this->options & self::STOP_ON_DIFF) {
-                return null;
-            }
         }
 
         return is_array($new) ? $newOrdered : (object)$newOrdered;

@@ -72,4 +72,42 @@ JSON;
 
     }
 
+    public function testMissingOp()
+    {
+        $this->setExpectedException(get_class(new Exception()), 'Missing "op" in operation data');
+        JsonPatch::import(array((object)array('path' => '/123')));
+    }
+
+    public function testMissingPath()
+    {
+        $this->setExpectedException(get_class(new Exception()), 'Missing "path" in operation data');
+        JsonPatch::import(array((object)array('op' => 'wat')));
+    }
+
+    public function testInvalidOp()
+    {
+        $this->setExpectedException(get_class(new Exception()), 'Unknown "op": wat');
+        JsonPatch::import(array((object)array('op' => 'wat', 'path' => '/123')));
+    }
+
+    public function testMissingFrom()
+    {
+        $this->setExpectedException(get_class(new Exception()), 'Missing "from" in operation data');
+        JsonPatch::import(array((object)array('op' => 'copy', 'path' => '/123')));
+    }
+
+    public function testMissingValue()
+    {
+        $this->setExpectedException(get_class(new Exception()), 'Missing "value" in operation data');
+        JsonPatch::import(array(array('op' => 'add', 'path' => '/123')));
+    }
+
+    public function testApply()
+    {
+        $p = JsonPatch::import(array(array('op' => 'copy', 'path' => '/1', 'from' => '/0')));
+        $original = array('AAA');
+        $p->apply($original);
+        $this->assertSame(array('AAA', 'AAA'), $original);
+    }
+
 }
