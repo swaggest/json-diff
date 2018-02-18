@@ -1,7 +1,7 @@
 {
     "name": "swaggest/json-diff",
-    "description": "JSON diff and rearrange tool for PHP",
-    "type": "tool",
+    "description": "JSON diff and rearrange library for PHP",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
@@ -10,7 +10,6 @@
         }
     ],
     "require-dev": {
-        "php-yaoi/php-yaoi": "^1",
         "phpunit/phpunit": "^4.8.23",
         "phpunit/php-code-coverage": "2.2.4",
         "codeclimate/php-test-reporter": "^0.4.0"
@@ -25,7 +24,9 @@
             "Swaggest\\JsonDiff\\Tests\\": "tests/src"
         }
     },
-    "bin": [
-        "bin/json-diff"
-    ]
+    "config": {
+        "platform": {
+            "php": "5.4.45"
+        }
+    }
 }
