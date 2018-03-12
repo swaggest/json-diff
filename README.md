@@ -1,4 +1,4 @@
-# JSON diff and rearrange tool for PHP
+# JSON diff/rearrange/patch/pointer library for PHP
 
 A PHP implementation for finding unordered diff between two `JSON` documents.
 
