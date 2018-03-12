@@ -57,6 +57,8 @@ class SpecTest extends \PHPUnit_Framework_TestCase
     }
 
     protected function doTest($case) {
+        $case = clone $case;
+
         if (isset($case->disabled) && $case->disabled) {
             $this->markTestSkipped('test is disabled');
             return;

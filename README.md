@@ -162,4 +162,4 @@ $this->assertEquals($diff->getRearranged(), $original);
 
 ## CLI tool
 
-Moved to [`swaggest/json-diff-cli`](https://github.com/swaggest/json-diff-cli)
+Moved to [`swaggest/json-cli`](https://github.com/swaggest/json-cli)
