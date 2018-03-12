@@ -38,7 +38,8 @@ class JsonPointer
         }
     }
 
-    private static function splitPathURIFragment(array $pathItems) {
+    private static function splitPathURIFragment(array $pathItems)
+    {
         $result = array();
         foreach ($pathItems as $key) {
             $key = str_replace(array('~1', '~0'), array('/', '~'), urldecode($key));
@@ -47,7 +48,8 @@ class JsonPointer
         return $result;
     }
 
-    private static function splitPathJsonString(array $pathItems) {
+    private static function splitPathJsonString(array $pathItems)
+    {
         $result = array();
         foreach ($pathItems as $key) {
             $key = str_replace(array('~1', '~0'), array('/', '~'), $key);
@@ -168,6 +170,17 @@ class JsonPointer
             }
         }
         return $ref;
+    }
+
+    /**
+     * @param $holder
+     * @param $pointer
+     * @return bool|mixed
+     * @throws Exception
+     */
+    public static function getByPointer($holder, $pointer)
+    {
+        return self::get($holder, self::splitPath($pointer));
     }
 
     /**

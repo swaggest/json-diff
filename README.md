@@ -13,6 +13,7 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
  * To detect breaking changes by analyzing removals and changes from original `JSON`.
  * To keep original order of object sets (for example `swagger.json` [parameters](https://swagger.io/docs/specification/describing-parameters/) list).
  * To make and apply JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
+ * To retrieve and modify data by [JSON Pointer](http://tools.ietf.org/html/rfc6901).
 
 ## Installation
 
@@ -31,6 +32,8 @@ composer require swaggest/json-diff
 ```
 
 ## Library usage
+
+### `JsonDiff`
 
 Create `JsonDiff` object from two values (`original` and `new`).
 
@@ -53,41 +56,75 @@ $r = new JsonDiff(
 
 On created object you have several handy methods.
 
-### `getPatch`
-Returns `JsonPatch` of difference
+#### `getPatch`
+Returns [`JsonPatch`](#jsonpatch) of difference
 
-### `getRearranged`
+#### `getRearranged`
 Returns new value, rearranged with original order.
 
-### `getRemoved`
+#### `getRemoved`
 Returns removals as partial value of original.
 
-### `getRemovedPaths`
+#### `getRemovedPaths`
 Returns list of `JSON` paths that were removed from original.
 
-### `getRemovedCnt`
+#### `getRemovedCnt`
 Returns number of removals.
 
-### `getAdded`
+#### `getAdded`
 Returns additions as partial value of new.
 
-### `getAddedPaths`
+#### `getAddedPaths`
 Returns list of `JSON` paths that were added to new.
 
-### `getAddedCnt`
+#### `getAddedCnt`
 Returns number of additions.
 
-### `getModifiedOriginal`
+#### `getModifiedOriginal`
 Returns modifications as partial value of original.
 
-### `getModifiedNew`
+#### `getModifiedNew`
 Returns modifications as partial value of new.
 
-### `getModifiedPaths`
+#### `getModifiedPaths`
 Returns list of `JSON` paths that were modified from original to new.
 
-### `getModifiedCnt`
+#### `getModifiedCnt`
 Returns number of modifications.
+
+### `JsonPatch`
+
+#### `import`
+Creates `JsonPatch` instance from `JSON`-decoded data.
+
+#### `export`
+Creates patch data from `JsonPatch` object.
+
+#### `op`
+Adds operation to `JsonPatch`.
+
+#### `apply`
+Applies patch to `JSON`-decoded data.
+
+### `JsonPointer`
+
+#### `escapeSegment`
+Escapes path segment.
+
+#### `splitPath`
+Creates array of unescaped segments from `JSON Pointer` string.
+
+#### `add`
+Adds value to data at path specified by segments.
+
+#### `get`
+Gets value from data at path specified by segments.
+
+#### `getByPointer`
+Gets value from data at path specified `JSON Pointer` string.
+
+#### `remove`
+Removes value from data at path specified by segments.
 
 ## Example
 

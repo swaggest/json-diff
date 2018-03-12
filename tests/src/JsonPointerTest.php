@@ -34,6 +34,7 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('{"l1":{"l2":[[0],{"1":1}]}}', json_encode($json));
 
         $this->assertSame(1, JsonPointer::get($json, JsonPointer::splitPath('/l1/l2/1/1')));
+        $this->assertSame(1, JsonPointer::getByPointer($json, '/l1/l2/1/1'));
     }
 
     /**
