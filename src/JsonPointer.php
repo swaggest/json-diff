@@ -13,7 +13,7 @@ class JsonPointer
     public static function escapeSegment($key, $isURIFragmentId = false)
     {
         if ($isURIFragmentId) {
-            return str_replace(array('%2F', '%7E'), array('~0', '~1'), urlencode($key));
+            return str_replace(array('%7E', '%2F'), array('~0', '~1'), urlencode($key));
         } else {
             return str_replace(array('~', '/'), array('~0', '~1'), $key);
         }

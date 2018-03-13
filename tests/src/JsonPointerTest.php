@@ -45,4 +45,11 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
         $json = json_decode('{"l1":{"200":1}}');
         $this->assertSame(1, JsonPointer::get($json, JsonPointer::splitPath('/l1/200')));
     }
+
+
+    public function testEscapeSegment()
+    {
+        $segment = '/project/{username}/{project}';
+        $this->assertSame('~1project~1%7Busername%7D~1%7Bproject%7D', JsonPointer::escapeSegment($segment, true));
+    }
 }
