@@ -173,8 +173,8 @@ class JsonPointer
     }
 
     /**
-     * @param $holder
-     * @param $pointer
+     * @param mixed $holder
+     * @param string $pointer
      * @return bool|mixed
      * @throws Exception
      */
