@@ -7,18 +7,23 @@ class JsonValueReplace
 {
     private $search;
     private $replace;
+    private $pathFilterRegex;
     private $path = '';
     private $pathItems = array();
+
+    public $affectedPaths = array();
 
     /**
      * JsonReplace constructor.
      * @param mixed $search
      * @param mixed $replace
+     * @param null|string $pathFilter Regular expression to check path
      */
-    public function __construct($search, $replace)
+    public function __construct($search, $replace, $pathFilter = null)
     {
         $this->search = $search;
         $this->replace = $replace;
+        $this->pathFilterRegex = $pathFilter;
     }
 
     /**
@@ -28,15 +33,28 @@ class JsonValueReplace
      */
     public function process($data)
     {
+        $check = true;
+        if ($this->pathFilterRegex && !preg_match($this->pathFilterRegex, $this->path)) {
+            $check = false;
+        }
+
         if (!is_array($data) && !is_object($data)) {
-            return $data === $this->search ? $this->replace : $data;
+            if ($check && $data === $this->search) {
+                $this->affectedPaths[] = $this->path;
+                return $this->replace;
+            } else {
+                return $data;
+            }
         }
 
         $originalKeys = $data instanceof \stdClass ? get_object_vars($data) : $data;
 
-        $diff = new JsonDiff($data, $this->search, JsonDiff::STOP_ON_DIFF);
-        if ($diff->getDiffCnt() === 0) {
-            return $this->replace;
+        if ($check) {
+            $diff = new JsonDiff($data, $this->search, JsonDiff::STOP_ON_DIFF);
+            if ($diff->getDiffCnt() === 0) {
+                $this->affectedPaths[] = $this->path;
+                return $this->replace;
+            }
         }
 
         $result = array();
