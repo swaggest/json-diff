@@ -14,6 +14,7 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
  * To keep original order of object sets (for example `swagger.json` [parameters](https://swagger.io/docs/specification/describing-parameters/) list).
  * To make and apply JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
  * To retrieve and modify data by [JSON Pointer](http://tools.ietf.org/html/rfc6901).
+ * To recursively replace by JSON value.
 
 ## Installation
 
@@ -125,6 +126,11 @@ Gets value from data at path specified `JSON Pointer` string.
 
 #### `remove`
 Removes value from data at path specified by segments.
+
+### `JsonValueReplace`
+
+#### `process`
+Recursively replaces all nodes equal to `search` value with `replace` value.
 
 ## Example
 
