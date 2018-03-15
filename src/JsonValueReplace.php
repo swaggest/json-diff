@@ -23,7 +23,7 @@ class JsonValueReplace
 
     /**
      * Recursively replaces all nodes equal to `search` value with `replace` value.
-     * @param $data
+     * @param mixed $data
      * @return mixed
      */
     public function process($data)
