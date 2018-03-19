@@ -110,4 +110,17 @@ JSON;
         $this->assertSame(array('AAA', 'AAA'), $original);
     }
 
+    public function testApplyContinueOnError()
+    {
+        $p = new JsonPatch();
+        $p->op(new JsonPatch\Test('/missing', 1));
+        $p->op(new JsonPatch\Copy('/1', '/0'));
+        $p->op(new JsonPatch\Test('/missing2', null));
+        $original = array('AAA');
+        $errors = $p->apply($original, false);
+        $this->assertSame(array('AAA', 'AAA'), $original);
+        $this->assertSame('Key not found: missing', $errors[0]->getMessage());
+        $this->assertSame('Key not found: missing2', $errors[1]->getMessage());
+    }
+
 }
