@@ -75,7 +75,15 @@ class JsonPointer
                         Exception::EMPTY_PROPERTY_NAME_UNSUPPORTED);
                 }
 
-                $ref = &$ref->$key;
+                if ($recursively) {
+                    $ref = &$ref->$key;
+                } else {
+                    if (!isset($ref->$key) && count($pathItems)) {
+                        throw new Exception('Non-existent path item: ' . $key);
+                    } else {
+                        $ref = &$ref->$key;
+                    }
+                }
             } else { // null or array
                 $intKey = filter_var($key, FILTER_VALIDATE_INT);
                 if ($ref === null && (false === $intKey || $intKey !== 0)) {

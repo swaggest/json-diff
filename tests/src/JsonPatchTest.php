@@ -123,4 +123,23 @@ JSON;
         $this->assertSame('Key not found: missing2', $errors[1]->getMessage());
     }
 
+
+    public function testApplyNonExistentLevelTwo()
+    {
+        $data = new \stdClass();
+        $p = new JsonPatch();
+        $p->op(new JsonPatch\Add('/some/path', 22));
+        $p->apply($data, false);
+        $this->assertEquals(new \stdClass(), $data);
+    }
+
+    public function testApplyNonExistentLevelOne()
+    {
+        $data = new \stdClass();
+        $p = new JsonPatch();
+        $p->op(new JsonPatch\Add('/some', 22));
+        $p->apply($data);
+        $this->assertEquals((object)array('some' => 22), $data);
+    }
+
 }
