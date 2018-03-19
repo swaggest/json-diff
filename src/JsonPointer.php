@@ -84,7 +84,7 @@ class JsonPointer
                         $ref = new \stdClass();
                         $ref = &$ref->{$key};
                     } else {
-                        throw new Exception('Non-existent path');
+                        throw new Exception('Non-existent path item: ' . $key);
                     }
                 } else {
                     if ($recursively && $ref === null) $ref = array();
