@@ -20,6 +20,20 @@ class JsonPointer
     }
 
     /**
+     * @param string[] $pathItems
+     * @param bool $isURIFragmentId
+     * @return string
+     */
+    public static function buildPath(array $pathItems, $isURIFragmentId = false)
+    {
+        $result = $isURIFragmentId ? '#' : '';
+        foreach ($pathItems as $pathItem) {
+            $result .= '/' . self::escapeSegment($pathItem, $isURIFragmentId);
+        }
+        return $result;
+    }
+
+    /**
      * @param string $path
      * @return string[]
      * @throws Exception

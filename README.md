@@ -115,6 +115,9 @@ Escapes path segment.
 #### `splitPath`
 Creates array of unescaped segments from `JSON Pointer` string.
 
+#### `buildPath`
+Creates `JSON Pointer` string from array of unescaped segments.
+
 #### `add`
 Adds value to data at path specified by segments.
 

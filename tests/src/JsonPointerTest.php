@@ -52,4 +52,14 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
         $segment = '/project/{username}/{project}';
         $this->assertSame('~1project~1%7Busername%7D~1%7Bproject%7D', JsonPointer::escapeSegment($segment, true));
     }
+
+    public function testBuildPath()
+    {
+        $pathItems = ['key1', '/project/{username}/{project}', 'key2'];
+
+        $this->assertSame('/key1/~1project~1{username}~1{project}/key2',
+            JsonPointer::buildPath($pathItems));
+        $this->assertSame('#/key1/~1project~1%7Busername%7D~1%7Bproject%7D/key2',
+            JsonPointer::buildPath($pathItems, true));
+    }
 }
