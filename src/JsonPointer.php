@@ -108,6 +108,9 @@ class JsonPointer
                     } else {
                         throw new Exception('Non-existent path item: ' . $key);
                     }
+                } elseif ([] === $ref && false === $intKey && '-' !== $key) {
+                    $ref = new \stdClass();
+                    $ref = &$ref->{$key};
                 } else {
                     if ($recursively && $ref === null) $ref = array();
                     if ('-' === $key) {
