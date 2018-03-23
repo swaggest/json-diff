@@ -107,6 +107,13 @@ Adds operation to `JsonPatch`.
 #### `apply`
 Applies patch to `JSON`-decoded data.
 
+#### `setFlags`
+Alters default behavior.
+
+Available flag:
+
+* `JsonPatch::STRICT_MODE` Disallow converting empty array to object for key creation.
+
 ### `JsonPointer`
 
 #### `escapeSegment`
