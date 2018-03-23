@@ -19,6 +19,24 @@ use Swaggest\JsonDiff\JsonPatch\Test;
  */
 class JsonPatch implements \JsonSerializable
 {
+    /**
+     * Disallow converting empty array to object for key creation
+     * @see JsonPointer::STRICT_MODE
+     */
+    const STRICT_MODE = 2;
+
+    private $flags = 0;
+
+    /**
+     * @param int $options
+     * @return $this
+     */
+    public function setFlags($options)
+    {
+        $this->flags = $options;
+        return $this;
+    }
+
     /** @var OpPath[] */
     private $operations = array();
 
@@ -118,18 +136,18 @@ class JsonPatch implements \JsonSerializable
                 $pathItems = JsonPointer::splitPath($operation->path);
                 switch (true) {
                     case $operation instanceof Add:
-                        JsonPointer::add($original, $pathItems, $operation->value, false);
+                        JsonPointer::add($original, $pathItems, $operation->value, $this->flags);
                         break;
                     case $operation instanceof Copy:
                         $fromItems = JsonPointer::splitPath($operation->from);
                         $value = JsonPointer::get($original, $fromItems);
-                        JsonPointer::add($original, $pathItems, $value, false);
+                        JsonPointer::add($original, $pathItems, $value, $this->flags);
                         break;
                     case $operation instanceof Move:
                         $fromItems = JsonPointer::splitPath($operation->from);
                         $value = JsonPointer::get($original, $fromItems);
                         JsonPointer::remove($original, $fromItems);
-                        JsonPointer::add($original, $pathItems, $value, false);
+                        JsonPointer::add($original, $pathItems, $value, $this->flags);
                         break;
                     case $operation instanceof Remove:
                         JsonPointer::remove($original, $pathItems);
@@ -137,7 +155,7 @@ class JsonPatch implements \JsonSerializable
                     case $operation instanceof Replace:
                         JsonPointer::get($original, $pathItems);
                         JsonPointer::remove($original, $pathItems);
-                        JsonPointer::add($original, $pathItems, $operation->value, false);
+                        JsonPointer::add($original, $pathItems, $operation->value, $this->flags);
                         break;
                     case $operation instanceof Test:
                         $value = JsonPointer::get($original, $pathItems);

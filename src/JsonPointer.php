@@ -6,6 +6,16 @@ namespace Swaggest\JsonDiff;
 class JsonPointer
 {
     /**
+     * Create intermediate keys if they don't exist
+     */
+    const RECURSIVE_KEY_CREATION = 1;
+
+    /**
+     * Disallow converting empty array to object for key creation
+     */
+    const STRICT_MODE = 2;
+
+    /**
      * @param string $key
      * @param bool $isURIFragmentId
      * @return string
@@ -76,10 +86,10 @@ class JsonPointer
      * @param mixed $holder
      * @param string[] $pathItems
      * @param mixed $value
-     * @param bool $recursively
+     * @param int $flags
      * @throws Exception
      */
-    public static function add(&$holder, $pathItems, $value, $recursively = true)
+    public static function add(&$holder, $pathItems, $value, $flags = self::RECURSIVE_KEY_CREATION)
     {
         $ref = &$holder;
         while (null !== $key = array_shift($pathItems)) {
@@ -89,7 +99,7 @@ class JsonPointer
                         Exception::EMPTY_PROPERTY_NAME_UNSUPPORTED);
                 }
 
-                if ($recursively) {
+                if ($flags & self::RECURSIVE_KEY_CREATION) {
                     $ref = &$ref->$key;
                 } else {
                     if (!isset($ref->$key) && count($pathItems)) {
@@ -102,17 +112,17 @@ class JsonPointer
                 $intKey = filter_var($key, FILTER_VALIDATE_INT);
                 if ($ref === null && (false === $intKey || $intKey !== 0)) {
                     $key = (string)$key;
-                    if ($recursively) {
+                    if ($flags & self::RECURSIVE_KEY_CREATION) {
                         $ref = new \stdClass();
                         $ref = &$ref->{$key};
                     } else {
                         throw new Exception('Non-existent path item: ' . $key);
                     }
-                } elseif ([] === $ref && false === $intKey && '-' !== $key) {
+                } elseif ([] === $ref && 0 === ($flags & self::STRICT_MODE) && false === $intKey && '-' !== $key) {
                     $ref = new \stdClass();
                     $ref = &$ref->{$key};
                 } else {
-                    if ($recursively && $ref === null) $ref = array();
+                    if ($flags & self::RECURSIVE_KEY_CREATION && $ref === null) $ref = array();
                     if ('-' === $key) {
                         $ref = &$ref[];
                     } else {
@@ -122,7 +132,7 @@ class JsonPointer
                         if (false === $intKey) {
                             throw new Exception('Invalid key for array operation');
                         }
-                        if ($intKey > count($ref) && !$recursively) {
+                        if ($intKey > count($ref) && 0 === ($flags & self::RECURSIVE_KEY_CREATION)) {
                             throw new Exception('Index is greater than number of items in array');
                         } elseif ($intKey < 0) {
                             throw new Exception('Negative index');
