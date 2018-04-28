@@ -16,6 +16,11 @@ class JsonPointer
     const STRICT_MODE = 2;
 
     /**
+     * Skip action if holder already has a non-null value at path
+     */
+    const SKIP_IF_ISSET = 4;
+
+    /**
      * @param string $key
      * @param bool $isURIFragmentId
      * @return string
@@ -142,6 +147,9 @@ class JsonPointer
                     }
                 }
             }
+        }
+        if ($ref !== null && $flags & self::SKIP_IF_ISSET) {
+            return;
         }
         $ref = $value;
     }

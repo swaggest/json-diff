@@ -17,6 +17,15 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
         JsonPointer::add($json, ['l1','l2','l3'], 'hello!');
         $this->assertSame('{"l1":{"l2":{"l3":"hello!"}}}', json_encode($json));
 
+        JsonPointer::add($json, ['l1', 'l2', 'l3'], 'hello again!', JsonPointer::SKIP_IF_ISSET);
+        $this->assertSame('{"l1":{"l2":{"l3":"hello!"}}}', json_encode($json));
+
+        JsonPointer::add($json, ['l1', 'l2', 'l3'], 'hello again!');
+        $this->assertSame('{"l1":{"l2":{"l3":"hello again!"}}}', json_encode($json));
+
+        JsonPointer::add($json, ['l1', 'l2', 'l3'], 'hello!');
+        $this->assertSame('{"l1":{"l2":{"l3":"hello!"}}}', json_encode($json));
+
         $this->assertSame('{"l3":"hello!"}', json_encode(JsonPointer::get($json, JsonPointer::splitPath('/l1/l2'))));
 
         try {
