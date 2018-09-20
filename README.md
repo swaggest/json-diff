@@ -12,8 +12,8 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
  * To simplify changes review between two `JSON` files you can use a standard `diff` tool on rearranged pretty-printed `JSON`.
  * To detect breaking changes by analyzing removals and changes from original `JSON`.
  * To keep original order of object sets (for example `swagger.json` [parameters](https://swagger.io/docs/specification/describing-parameters/) list).
- * To make and apply JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
- * To make and apply JSON Merge Patches, specified in [RFC 7386](https://tools.ietf.org/html/rfc7386) from the IETF.
+ * To [make](#getpatch) and [apply](#jsonpatch) JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
+ * To [make](#getmergepatch) and [apply](#jsonmergepatch) JSON Merge Patches, specified in [RFC 7386](https://tools.ietf.org/html/rfc7386) from the IETF.
  * To retrieve and modify data by [JSON Pointer](http://tools.ietf.org/html/rfc6901).
  * To recursively replace by JSON value.
 
