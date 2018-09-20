@@ -56,7 +56,8 @@ class SpecTest extends \PHPUnit_Framework_TestCase
         return $testCases;
     }
 
-    protected function doTest($case) {
+    protected function doTest($case)
+    {
         $case = clone $case;
 
         if (isset($case->disabled) && $case->disabled) {

@@ -13,6 +13,7 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
  * To detect breaking changes by analyzing removals and changes from original `JSON`.
  * To keep original order of object sets (for example `swagger.json` [parameters](https://swagger.io/docs/specification/describing-parameters/) list).
  * To make and apply JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
+ * To make and apply JSON Merge Patches, specified in [RFC 7386](https://tools.ietf.org/html/rfc7386) from the IETF.
  * To retrieve and modify data by [JSON Pointer](http://tools.ietf.org/html/rfc6901).
  * To recursively replace by JSON value.
 
@@ -55,10 +56,22 @@ $r = new JsonDiff(
 );
 ```
 
+Available options:
+ * `REARRANGE_ARRAYS` is an option to enable arrays rearrangement to minimize the difference.
+ * `STOP_ON_DIFF` is an option to improve performance by stopping comparison when a difference is found.
+ * `JSON_URI_FRAGMENT_ID` is an option to use URI Fragment Identifier Representation (example: "#/c%25d"). If not set default JSON String Representation (example: "/c%d").
+ * `SKIP_JSON_PATCH` is an option to improve performance by not building JsonPatch for this diff.
+ * `SKIP_JSON_MERGE_PATCH` is an option to improve performance by not building JSON Merge Patch value for this diff.
+
+Options can be combined, e.g. `JsonDiff::REARRANGE_ARRAYS + JsonDiff::STOP_ON_DIFF`.
+
 On created object you have several handy methods.
 
 #### `getPatch`
 Returns [`JsonPatch`](#jsonpatch) of difference
+
+#### `getMergePatch`
+Returns [JSON Merge Patch](https://tools.ietf.org/html/rfc7386) value of difference
 
 #### `getRearranged`
 Returns new value, rearranged with original order.
@@ -136,6 +149,11 @@ Gets value from data at path specified `JSON Pointer` string.
 
 #### `remove`
 Removes value from data at path specified by segments.
+
+### `JsonMergePatch`
+
+#### `apply`
+Applies patch to `JSON`-decoded data.
 
 ### `JsonValueReplace`
 

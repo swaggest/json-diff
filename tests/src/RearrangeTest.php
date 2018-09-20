@@ -8,6 +8,9 @@ use Swaggest\JsonDiff\JsonPatch;
 
 class RearrangeTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @throws \Swaggest\JsonDiff\Exception
+     */
     public function testKeepOrder()
     {
         $originalJson = <<<'JSON'

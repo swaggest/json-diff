@@ -1,0 +1,190 @@
+[
+  {
+    "doc": {
+      "a": "b"
+    },
+    "patch": {
+      "a": "c"
+    },
+    "expected": {
+      "a": "c"
+    }
+  },
+  {
+    "doc": {
+      "a": "b"
+    },
+    "patch": {
+      "b": "c"
+    },
+    "expected": {
+      "a": "b",
+      "b": "c"
+    }
+  },
+  {
+    "doc": {
+      "a": "b"
+    },
+    "patch": {
+      "a": null
+    },
+    "expected": {}
+  },
+  {
+    "doc": {
+      "a": "b",
+      "b": "c"
+    },
+    "patch": {
+      "a": null
+    },
+    "expected": {
+      "b": "c"
+    }
+  },
+  {
+    "doc": {
+      "a": [
+        "b"
+      ]
+    },
+    "patch": {
+      "a": "c"
+    },
+    "expected": {
+      "a": "c"
+    }
+  },
+  {
+    "doc": {
+      "a": "c"
+    },
+    "patch": {
+      "a": [
+        "b"
+      ]
+    },
+    "expected": {
+      "a": [
+        "b"
+      ]
+    }
+  },
+  {
+    "doc": {
+      "a": {
+        "b": "c"
+      }
+    },
+    "patch": {
+      "a": {
+        "b": "d",
+        "c": null
+      }
+    },
+    "expected": {
+      "a": {
+        "b": "d"
+      }
+    }
+  },
+  {
+    "doc": {
+      "a": [
+        {
+          "b": "c"
+        }
+      ]
+    },
+    "patch": {
+      "a": [
+        1
+      ]
+    },
+    "expected": {
+      "a": [
+        1
+      ]
+    }
+  },
+  {
+    "doc": [
+      "a",
+      "b"
+    ],
+    "patch": [
+      "c",
+      "d"
+    ],
+    "expected": [
+      "c",
+      "d"
+    ]
+  },
+  {
+    "doc": {
+      "a": "b"
+    },
+    "patch": [
+      "c"
+    ],
+    "expected": [
+      "c"
+    ]
+  },
+  {
+    "doc": {
+      "a": "foo"
+    },
+    "patch": null,
+    "expected": null
+  },
+  {
+    "doc": {
+      "a": "foo"
+    },
+    "patch": "bar",
+    "expected": "bar"
+  },
+  {
+    "doc": {
+      "e": null
+    },
+    "patch": {
+      "a": 1
+    },
+    "expected": {
+      "e": null,
+      "a": 1
+    }
+  },
+  {
+    "doc": [
+      1,
+      2
+    ],
+    "patch": {
+      "a": "b",
+      "c": null
+    },
+    "expected": {
+      "a": "b"
+    }
+  },
+  {
+    "doc": {},
+    "patch": {
+      "a": {
+        "bb": {
+          "ccc": null
+        }
+      }
+    },
+    "expected": {
+      "a": {
+        "bb": {}
+      }
+    }
+  }
+]

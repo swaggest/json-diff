@@ -9,18 +9,40 @@ use Swaggest\JsonDiff\JsonPatch\Test;
 
 class JsonDiff
 {
+    /**
+     * REARRANGE_ARRAYS is an option to enable arrays rearrangement to minimize the difference.
+     */
     const REARRANGE_ARRAYS = 1;
+
+    /**
+     * STOP_ON_DIFF is an option to improve performance by stopping comparison when a difference is found.
+     */
     const STOP_ON_DIFF = 2;
 
     /**
-     * Use URI Fragment Identifier Representation will be used (example: "#/c%25d").
+     * JSON_URI_FRAGMENT_ID is an option to use URI Fragment Identifier Representation (example: "#/c%25d").
      * If not set default JSON String Representation (example: "/c%d").
      */
     const JSON_URI_FRAGMENT_ID = 4;
 
+    /**
+     * SKIP_JSON_PATCH is an option to improve performance by not building JsonPatch for this diff.
+     */
+    const SKIP_JSON_PATCH = 8;
+
+    /**
+     * SKIP_JSON_MERGE_PATCH is an option to improve performance by not building JSON Merge Patch value for this diff.
+     */
+    const SKIP_JSON_MERGE_PATCH = 16;
+
     private $options = 0;
     private $original;
     private $new;
+
+    /**
+     * @var mixed Merge patch container
+     */
+    private $merge;
 
     private $added;
     private $addedCnt = 0;
@@ -44,7 +66,6 @@ class JsonDiff
     private $jsonPatch;
 
     /**
-     * Processor constructor.
      * @param mixed $original
      * @param mixed $new
      * @param int $options
@@ -52,7 +73,9 @@ class JsonDiff
      */
     public function __construct($original, $new, $options = 0)
     {
-        $this->jsonPatch = new JsonPatch();
+        if (!($options & self::SKIP_JSON_PATCH)) {
+            $this->jsonPatch = new JsonPatch();
+        }
 
         $this->original = $original;
         $this->new = $new;
@@ -63,6 +86,9 @@ class JsonDiff
         }
 
         $this->rearranged = $this->rearrange();
+        if (($new !== null) && $this->merge === null) {
+            $this->merge = new \stdClass();
+        }
     }
 
     /**
@@ -183,6 +209,15 @@ class JsonDiff
     }
 
     /**
+     * Returns JSON Merge Patch value of difference
+     */
+    public function getMergePatch()
+    {
+        return $this->merge;
+
+    }
+
+    /**
      * @return array|null|object|\stdClass
      * @throws Exception
      */
@@ -199,6 +234,8 @@ class JsonDiff
      */
     private function process($original, $new)
     {
+        $merge = !($this->options & self::SKIP_JSON_MERGE_PATCH);
+
         if (
             (!$original instanceof \stdClass && !is_array($original))
             || (!$new instanceof \stdClass && !is_array($new))
@@ -210,12 +247,17 @@ class JsonDiff
                 }
                 $this->modifiedPaths [] = $this->path;
 
-                $this->jsonPatch->op(new Test($this->path, $original));
-                $this->jsonPatch->op(new Replace($this->path, $new));
+                if ($this->jsonPatch !== null) {
+                    $this->jsonPatch->op(new Test($this->path, $original));
+                    $this->jsonPatch->op(new Replace($this->path, $new));
+                }
 
                 JsonPointer::add($this->modifiedOriginal, $this->pathItems, $original);
                 JsonPointer::add($this->modifiedNew, $this->pathItems, $new);
 
+                if ($merge) {
+                    JsonPointer::add($this->merge, $this->pathItems, $new, JsonPointer::RECURSIVE_KEY_CREATION);
+                }
             }
             return $new;
         }
@@ -234,6 +276,15 @@ class JsonDiff
         $isArray = is_array($original);
         $removedOffset = 0;
 
+        if ($merge && is_array($new) && !is_array($original)) {
+            $merge = false;
+            JsonPointer::add($this->merge, $this->pathItems, $new);
+        } elseif ($merge  && $new instanceof \stdClass && !$original instanceof \stdClass) {
+            $merge = false;
+            JsonPointer::add($this->merge, $this->pathItems, $new);
+        }
+
+        $isUriFragment = (bool)($this->options & self::JSON_URI_FRAGMENT_ID);
         foreach ($originalKeys as $key => $originalValue) {
             if ($this->options & self::STOP_ON_DIFF) {
                 if ($this->modifiedCnt || $this->addedCnt || $this->removedCnt) {
@@ -247,7 +298,7 @@ class JsonDiff
             if ($isArray) {
                 $actualKey -= $removedOffset;
             }
-            $this->path .= '/' . JsonPointer::escapeSegment($actualKey, $this->options & self::JSON_URI_FRAGMENT_ID);
+            $this->path .= '/' . JsonPointer::escapeSegment((string)$actualKey, $isUriFragment);
             $this->pathItems[] = $actualKey;
 
             if (array_key_exists($key, $newArray)) {
@@ -263,9 +314,15 @@ class JsonDiff
                     $removedOffset++;
                 }
 
-                $this->jsonPatch->op(new Remove($this->path));
+                if ($this->jsonPatch !== null) {
+                    $this->jsonPatch->op(new Remove($this->path));
+                }
 
                 JsonPointer::add($this->removed, $this->pathItems, $originalValue);
+                if ($merge) {
+                    JsonPointer::add($this->merge, $this->pathItems, null);
+                }
+
             }
             $this->path = $path;
             $this->pathItems = $pathItems;
@@ -278,13 +335,19 @@ class JsonDiff
                 return null;
             }
             $newOrdered[$key] = $value;
-            $path = $this->path . '/' . JsonPointer::escapeSegment($key, $this->options & self::JSON_URI_FRAGMENT_ID);
+            $path = $this->path . '/' . JsonPointer::escapeSegment($key, $isUriFragment);
             $pathItems = $this->pathItems;
             $pathItems[] = $key;
             JsonPointer::add($this->added, $pathItems, $value);
+            if ($merge) {
+                JsonPointer::add($this->merge, $pathItems, $value);
+            }
+
             $this->addedPaths [] = $path;
 
-            $this->jsonPatch->op(new Add($path, $value));
+            if ($this->jsonPatch !== null) {
+                $this->jsonPatch->op(new Add($path, $value));
+            }
 
         }
 
@@ -302,6 +365,7 @@ class JsonDiff
         $uniqueIdx = array();
 
         // find unique key for all items
+        /** @var mixed[string]  $f */
         $f = get_object_vars($first);
         foreach ($f as $key => $value) {
             if (is_array($value) || $value instanceof \stdClass) {

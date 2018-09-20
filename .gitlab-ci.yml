@@ -1,0 +1,39 @@
+before_script:
+- apt-get update -yqq
+- apt-get install git unzip -yqq
+- curl https://composer.github.io/installer.sig | tr -d '\n' > installer.sig
+- php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+- php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+- php composer-setup.php
+- php -r "unlink('composer-setup.php'); unlink('installer.sig');"
+- php composer.phar install --prefer-dist --no-ansi --no-interaction --no-progress
+
+test:5.6:
+  image: php:5.6
+  script:
+  - pecl install xdebug-2.5.5
+  - docker-php-ext-enable xdebug
+  - vendor/bin/phpunit --configuration phpunit.xml -v --coverage-text --colors=never --stderr
+
+test:7.0:
+  image: php:7.0
+  script:
+  - pecl install xdebug
+  - docker-php-ext-enable xdebug
+  - vendor/bin/phpunit --configuration phpunit.xml -v --coverage-text --colors=never --stderr
+
+test:7.1:
+  image: php:7.1
+  script:
+  - pecl install xdebug
+  - docker-php-ext-enable xdebug
+  - vendor/bin/phpunit --configuration phpunit.xml -v --coverage-text --colors=never --stderr
+
+test:7.2:
+  image: php:7.2
+  script:
+  - pecl install xdebug
+  - docker-php-ext-enable xdebug
+  - vendor/bin/phpunit --configuration phpunit.xml -v --coverage-text --colors=never --stderr
+  - curl https://github.com/phpstan/phpstan/releases/download/0.9.2/phpstan.phar -sLo ./phpstan.phar
+  - php phpstan.phar analyze -l 7 ./src

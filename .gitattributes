@@ -11,3 +11,4 @@
 /phpunit.xml export-ignore
 /changelog.md export-ignore
 /Makefile export-ignore
+/.gitlab-ci.yml
