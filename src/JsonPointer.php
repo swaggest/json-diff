@@ -21,6 +21,11 @@ class JsonPointer
     const SKIP_IF_ISSET = 4;
 
     /**
+     * Allow associative arrays to mimic JSON objects (not recommended)
+     */
+    const TOLERATE_ASSOCIATIVE_ARRAYS = 8;
+
+    /**
      * @param string $key
      * @param bool $isURIFragmentId
      * @return string
@@ -135,12 +140,16 @@ class JsonPointer
                             array_splice($ref, $key, 0, array($value));
                         }
                         if (false === $intKey) {
-                            throw new Exception('Invalid key for array operation');
+                            if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
+                                throw new Exception('Invalid key for array operation');
+                            }
                         }
-                        if ($intKey > count($ref) && 0 === ($flags & self::RECURSIVE_KEY_CREATION)) {
-                            throw new Exception('Index is greater than number of items in array');
-                        } elseif ($intKey < 0) {
-                            throw new Exception('Negative index');
+                        if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
+                            if ($intKey > count($ref) && 0 === ($flags & self::RECURSIVE_KEY_CREATION)) {
+                                throw new Exception('Index is greater than number of items in array');
+                            } elseif ($intKey < 0) {
+                                throw new Exception('Negative index');
+                            }
                         }
 
                         $ref = &$ref[$intKey];

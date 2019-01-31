@@ -25,6 +25,12 @@ class JsonPatch implements \JsonSerializable
      */
     const STRICT_MODE = 2;
 
+    /**
+     * Allow associative arrays to mimic JSON objects (not recommended)
+     */
+    const TOLERATE_ASSOCIATIVE_ARRAYS = 8;
+
+
     private $flags = 0;
 
     /**
