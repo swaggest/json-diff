@@ -56,6 +56,7 @@ class JsonDiff
     private $modifiedNew;
     private $modifiedCnt = 0;
     private $modifiedPaths = array();
+    private $modifiedDiff = array();
 
     private $path = '';
     private $pathItems = array();
@@ -191,6 +192,15 @@ class JsonDiff
     }
 
     /**
+     * Returns list of paths with original and new values.
+     * @return array
+     */
+    public function getModifiedDiff()
+    {
+        return $this->modifiedDiff;
+    }
+
+    /**
      * Returns new value, rearranged with original order.
      * @return array|object
      */
@@ -258,6 +268,12 @@ class JsonDiff
                 if ($merge) {
                     JsonPointer::add($this->merge, $this->pathItems, $new, JsonPointer::RECURSIVE_KEY_CREATION);
                 }
+
+                $this->modifiedDiff[] = [
+                    'path' => $this->path,
+                    'original' => $original,
+                    'new' => $new,
+                ];
             }
             return $new;
         }

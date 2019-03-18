@@ -87,6 +87,24 @@ JSON;
 
         $this->assertSame('{"key1":[4],"key3":{"sub1":"a","sub2":"b"}}', json_encode($r->getModifiedOriginal()));
         $this->assertSame('{"key1":[5],"key3":{"sub1":"c","sub2":false}}', json_encode($r->getModifiedNew()));
+
+        $this->assertSame([
+            [
+                'path' => '/key1/0',
+                'original' => 4,
+                'new' => 5,
+            ],
+            [
+                'path' => '/key3/sub1',
+                'original' => 'a',
+                'new' => 'c',
+            ],
+            [
+                'path' => '/key3/sub2',
+                'original' => 'b',
+                'new' => false,
+            ],
+        ], $r->getModifiedDiff());
     }
 
 
