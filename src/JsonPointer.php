@@ -98,7 +98,7 @@ class JsonPointer
     {
         $ref = &$holder;
         while (null !== $key = array_shift($pathItems)) {
-            if ($ref instanceof \stdClass) {
+            if ($ref instanceof \stdClass || is_object($ref)) {
                 if (PHP_VERSION_ID < 71000 && '' === $key) {
                     throw new Exception('Empty property name is not supported by PHP <7.1',
                         Exception::EMPTY_PROPERTY_NAME_UNSUPPORTED);
@@ -208,6 +208,12 @@ class JsonPointer
                 } else {
                     throw new Exception('Key not found: ' . $key);
                 }
+            } elseif (is_object($ref)) {
+                if (isset($ref->$key)) {
+                    $ref = $ref->$key;
+                } else {
+                    throw new Exception('Key not found: ' . $key);
+                }
             } else {
                 throw new Exception('Key not found: ' . $key);
             }
@@ -244,6 +250,12 @@ class JsonPointer
                 } else {
                     throw new Exception('Key not found: ' . $key);
                 }
+            } elseif (is_object($ref)) {
+                if (isset($ref->$key)) {
+                    $ref = &$ref->$key;
+                } else {
+                    throw new Exception('Key not found: ' . $key);
+                }
             } else {
                 if (array_key_exists($key, $ref)) {
                     $ref = &$ref[$key];
@@ -254,7 +266,7 @@ class JsonPointer
         }
 
         if (isset($parent) && isset($refKey)) {
-            if ($parent instanceof \stdClass) {
+            if ($parent instanceof \stdClass || is_object($parent)) {
                 unset($parent->$refKey);
             } else {
                 unset($parent[$refKey]);

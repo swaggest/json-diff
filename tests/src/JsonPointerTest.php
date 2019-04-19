@@ -14,7 +14,7 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
     public function testProcess()
     {
         $json = new \stdClass();
-        JsonPointer::add($json, ['l1','l2','l3'], 'hello!');
+        JsonPointer::add($json, ['l1', 'l2', 'l3'], 'hello!');
         $this->assertSame('{"l1":{"l2":{"l3":"hello!"}}}', json_encode($json));
 
         JsonPointer::add($json, ['l1', 'l2', 'l3'], 'hello again!', JsonPointer::SKIP_IF_ISSET);
@@ -34,7 +34,7 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
             $this->assertSame('Key not found: non-existent', $exception->getMessage());
         }
 
-        JsonPointer::remove($json, ['l1','l2']);
+        JsonPointer::remove($json, ['l1', 'l2']);
         $this->assertSame('{"l1":{}}', json_encode($json));
 
         JsonPointer::add($json, JsonPointer::splitPath('/l1/l2/0/0'), 0);
@@ -71,4 +71,61 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('#/key1/~1project~1%7Busername%7D~1%7Bproject%7D/key2',
             JsonPointer::buildPath($pathItems, true));
     }
+
+    public function testGetSetDeleteObject()
+    {
+        $s = new Sample();
+        $s->one = new Sample();
+        $s->one->two = 2;
+
+        $this->assertEquals(2, JsonPointer::get($s, ['one', 'two']));
+
+
+        JsonPointer::add($s, ['one', 'two'], 22);
+        $this->assertEquals(22, JsonPointer::get($s, ['one', 'two']));
+        $this->assertEquals(22, $s->one->two);
+
+        JsonPointer::remove($s, ['one', 'two']);
+        try {
+            JsonPointer::get($s, ['one', 'two']);
+            $this->fail('Exception expected');
+        } catch (Exception $e) {
+            $this->assertEquals('Key not found: two', $e->getMessage());
+        }
+        $this->assertEquals(null, $s->one->two);
+    }
+
+}
+
+class Sample
+{
+    public $declared;
+
+    private $_data = [];
+
+    public function __isset($name)
+    {
+        return isset($this->_data[$name]);
+    }
+
+    public function &__get($name)
+    {
+        if (array_key_exists($name, $this->_data)) {
+            return $this->_data[$name];
+        } else {
+            $tmp = null;
+            return $tmp;;
+        }
+    }
+
+    public function __set($name, $value)
+    {
+        $this->_data[$name] = $value;
+    }
+
+    public function __unset($name)
+    {
+        unset($this->_data[$name]);
+    }
+
 }

@@ -231,6 +231,12 @@ $patch->apply($original);
 $this->assertEquals($diff->getRearranged(), $original);
 ```
 
+## PHP Classes as JSON objects
+
+Due to magical methods and other restrictions PHP classes can not be reliably mapped to/from JSON objects.
+There is support for objects of PHP classes in `JsonPointer` with limitations:
+* `null` is equal to non-existent
+
 ## CLI tool
 
 Moved to [`swaggest/json-cli`](https://github.com/swaggest/json-cli)
