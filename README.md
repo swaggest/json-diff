@@ -62,6 +62,7 @@ Available options:
  * `JSON_URI_FRAGMENT_ID` is an option to use URI Fragment Identifier Representation (example: "#/c%25d"). If not set default JSON String Representation (example: "/c%d").
  * `SKIP_JSON_PATCH` is an option to improve performance by not building JsonPatch for this diff.
  * `SKIP_JSON_MERGE_PATCH` is an option to improve performance by not building JSON Merge Patch value for this diff.
+ * `TOLERATE_ASSOCIATIVE_ARRAYS` is an option to allow associative arrays to mimic JSON objects (not recommended).
 
 Options can be combined, e.g. `JsonDiff::REARRANGE_ARRAYS + JsonDiff::STOP_ON_DIFF`.
 
@@ -123,9 +124,10 @@ Applies patch to `JSON`-decoded data.
 #### `setFlags`
 Alters default behavior.
 
-Available flag:
+Available flags:
 
 * `JsonPatch::STRICT_MODE` Disallow converting empty array to object for key creation.
+* `JsonPatch::TOLERATE_ASSOCIATIVE_ARRAYS` Allow associative arrays to mimic JSON objects (not recommended).
 
 ### `JsonPointer`
 

@@ -35,6 +35,11 @@ class JsonDiff
      */
     const SKIP_JSON_MERGE_PATCH = 16;
 
+    /**
+     * TOLERATE_ASSOCIATIVE_ARRAYS is an option to allow associative arrays to mimic JSON objects (not recommended)
+     */
+    const TOLERATE_ASSOCIATIVE_ARRAYS = 32;
+
     private $options = 0;
     private $original;
     private $new;
@@ -235,6 +240,16 @@ class JsonDiff
     private function process($original, $new)
     {
         $merge = !($this->options & self::SKIP_JSON_MERGE_PATCH);
+
+        if ($this->options & self::TOLERATE_ASSOCIATIVE_ARRAYS) {
+            if (is_array($original) && !empty($original) && !array_key_exists(0, $original)) {
+                $original = (object)$original;
+            }
+
+            if (is_array($new) && !empty($new) && !array_key_exists(0, $new)) {
+                $new = (object)$new;
+            }
+        }
 
         if (
             (!$original instanceof \stdClass && !is_array($original))

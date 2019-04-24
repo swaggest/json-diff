@@ -21,6 +21,11 @@ class JsonPointer
     const SKIP_IF_ISSET = 4;
 
     /**
+     * Allow associative arrays to mimic JSON objects (not recommended)
+     */
+    const TOLERATE_ASSOCIATIVE_ARRAYS = 8;
+
+    /**
      * @param string $key
      * @param bool $isURIFragmentId
      * @return string
@@ -135,12 +140,18 @@ class JsonPointer
                             array_splice($ref, $key, 0, array($value));
                         }
                         if (false === $intKey) {
-                            throw new Exception('Invalid key for array operation');
+                            if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
+                                throw new Exception('Invalid key for array operation');
+                            }
+                            $ref = &$ref[$key];
+                            continue;
                         }
-                        if ($intKey > count($ref) && 0 === ($flags & self::RECURSIVE_KEY_CREATION)) {
-                            throw new Exception('Index is greater than number of items in array');
-                        } elseif ($intKey < 0) {
-                            throw new Exception('Negative index');
+                        if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
+                            if ($intKey > count($ref) && 0 === ($flags & self::RECURSIVE_KEY_CREATION)) {
+                                throw new Exception('Index is greater than number of items in array');
+                            } elseif ($intKey < 0) {
+                                throw new Exception('Negative index');
+                            }
                         }
 
                         $ref = &$ref[$intKey];
@@ -235,10 +246,11 @@ class JsonPointer
     /**
      * @param mixed $holder
      * @param string[] $pathItems
+     * @param int $flags
      * @return mixed
      * @throws Exception
      */
-    public static function remove(&$holder, $pathItems)
+    public static function remove(&$holder, $pathItems, $flags = 0)
     {
         $ref = &$holder;
         while (null !== $key = array_shift($pathItems)) {
@@ -269,12 +281,26 @@ class JsonPointer
             if ($parent instanceof \stdClass || is_object($parent)) {
                 unset($parent->$refKey);
             } else {
+                $isAssociative = false;
+                $ff = $flags & self::TOLERATE_ASSOCIATIVE_ARRAYS;
+                if ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS) {
+                    $i = 0;
+                    foreach ($parent as $index => $value) {
+                        if ($i !== $index) {
+                            $isAssociative = true;
+                            break;
+                        }
+                    }
+                }
+
                 unset($parent[$refKey]);
-                if ($refKey !== count($parent)) {
+                if (!$isAssociative && (int)$refKey !== count($parent)) {
                     $parent = array_values($parent);
                 }
             }
         }
+
         return $ref;
     }
+
 }
