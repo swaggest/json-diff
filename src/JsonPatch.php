@@ -25,6 +25,12 @@ class JsonPatch implements \JsonSerializable
      */
     const STRICT_MODE = 2;
 
+    /**
+     * Allow associative arrays to mimic JSON objects (not recommended)
+     */
+    const TOLERATE_ASSOCIATIVE_ARRAYS = 8;
+
+
     private $flags = 0;
 
     /**
@@ -146,15 +152,15 @@ class JsonPatch implements \JsonSerializable
                     case $operation instanceof Move:
                         $fromItems = JsonPointer::splitPath($operation->from);
                         $value = JsonPointer::get($original, $fromItems);
-                        JsonPointer::remove($original, $fromItems);
+                        JsonPointer::remove($original, $fromItems, $this->flags);
                         JsonPointer::add($original, $pathItems, $value, $this->flags);
                         break;
                     case $operation instanceof Remove:
-                        JsonPointer::remove($original, $pathItems);
+                        JsonPointer::remove($original, $pathItems, $this->flags);
                         break;
                     case $operation instanceof Replace:
                         JsonPointer::get($original, $pathItems);
-                        JsonPointer::remove($original, $pathItems);
+                        JsonPointer::remove($original, $pathItems, $this->flags);
                         JsonPointer::add($original, $pathItems, $operation->value, $this->flags);
                         break;
                     case $operation instanceof Test:
