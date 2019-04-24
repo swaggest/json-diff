@@ -101,6 +101,9 @@ Returns modifications as partial value of original.
 #### `getModifiedNew`
 Returns modifications as partial value of new.
 
+#### `getModifiedDiff`
+Returns list of paths with original and new values.
+
 #### `getModifiedPaths`
 Returns list of `JSON` paths that were modified from original to new.
 
