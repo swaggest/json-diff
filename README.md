@@ -102,7 +102,9 @@ Returns modifications as partial value of original.
 Returns modifications as partial value of new.
 
 #### `getModifiedDiff`
-Returns list of paths with original and new values.
+Returns list of `ModifiedPathDiff` containing paths with original and new values.
+
+Not collected by default, requires `JsonDiff::COLLECT_MODIFIED_DIFF` option.
 
 #### `getModifiedPaths`
 Returns list of `JSON` paths that were modified from original to new.
