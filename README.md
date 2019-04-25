@@ -63,6 +63,7 @@ Available options:
  * `SKIP_JSON_PATCH` is an option to improve performance by not building JsonPatch for this diff.
  * `SKIP_JSON_MERGE_PATCH` is an option to improve performance by not building JSON Merge Patch value for this diff.
  * `TOLERATE_ASSOCIATIVE_ARRAYS` is an option to allow associative arrays to mimic JSON objects (not recommended).
+ * `COLLECT_MODIFIED_DIFF` is an option to enable [getModifiedDiff](#getmodifieddiff).
 
 Options can be combined, e.g. `JsonDiff::REARRANGE_ARRAYS + JsonDiff::STOP_ON_DIFF`.
 
@@ -102,7 +103,7 @@ Returns modifications as partial value of original.
 Returns modifications as partial value of new.
 
 #### `getModifiedDiff`
-Returns list of `ModifiedPathDiff` containing paths with original and new values.
+Returns list of [`ModifiedPathDiff`](src/ModifiedPathDiff.php) containing paths with original and new values.
 
 Not collected by default, requires `JsonDiff::COLLECT_MODIFIED_DIFF` option.
 
