@@ -5,6 +5,7 @@ namespace Swaggest\JsonDiff\Tests;
 
 use Swaggest\JsonDiff\JsonDiff;
 use Swaggest\JsonDiff\JsonPatch;
+use Swaggest\JsonDiff\ModifiedPathDiff;
 
 class RearrangeTest extends \PHPUnit_Framework_TestCase
 {
@@ -58,7 +59,7 @@ JSON;
 }
 JSON;
 
-        $r = new JsonDiff(json_decode($originalJson), json_decode($newJson), JsonDiff::REARRANGE_ARRAYS);
+        $r = new JsonDiff(json_decode($originalJson), json_decode($newJson), JsonDiff::REARRANGE_ARRAYS + JsonDiff::COLLECT_MODIFIED_DIFF);
         $this->assertSame(
             json_encode(json_decode($expected), JSON_PRETTY_PRINT),
             json_encode($r->getRearranged(), JSON_PRETTY_PRINT)
@@ -88,22 +89,10 @@ JSON;
         $this->assertSame('{"key1":[4],"key3":{"sub1":"a","sub2":"b"}}', json_encode($r->getModifiedOriginal()));
         $this->assertSame('{"key1":[5],"key3":{"sub1":"c","sub2":false}}', json_encode($r->getModifiedNew()));
 
-        $this->assertSame([
-            [
-                'path' => '/key1/0',
-                'original' => 4,
-                'new' => 5,
-            ],
-            [
-                'path' => '/key3/sub1',
-                'original' => 'a',
-                'new' => 'c',
-            ],
-            [
-                'path' => '/key3/sub2',
-                'original' => 'b',
-                'new' => false,
-            ],
+        $this->assertEquals([
+            new ModifiedPathDiff('/key1/0', 4, 5),
+            new ModifiedPathDiff('/key3/sub1', 'a', 'c'),
+            new ModifiedPathDiff('/key3/sub2', 'b', false),
         ], $r->getModifiedDiff());
     }
 
