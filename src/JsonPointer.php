@@ -136,15 +136,15 @@ class JsonPointer
                     if ('-' === $key) {
                         $ref = &$ref[];
                     } else {
-                        if (is_array($ref) && array_key_exists($key, $ref) && empty($pathItems)) {
-                            array_splice($ref, $key, 0, array($value));
-                        }
                         if (false === $intKey) {
                             if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
                                 throw new Exception('Invalid key for array operation');
                             }
                             $ref = &$ref[$key];
                             continue;
+                        }
+                        if (is_array($ref) && array_key_exists($key, $ref) && empty($pathItems)) {
+                            array_splice($ref, $intKey, 0, array($value));
                         }
                         if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
                             if ($intKey > count($ref) && 0 === ($flags & self::RECURSIVE_KEY_CREATION)) {

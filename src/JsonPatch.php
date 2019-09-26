@@ -92,10 +92,11 @@ class JsonPatch implements \JsonSerializable
             }
             $op->path = $operation->path;
             if ($op instanceof OpPathValue) {
-                if (!array_key_exists('value', (array)$operation)) {
+                if (property_exists($operation, 'value')) {
+                    $op->value = $operation->value;
+                } else {
                     throw new Exception('Missing "value" in operation data');
                 }
-                $op->value = $operation->value;
             } elseif ($op instanceof OpPathFrom) {
                 if (!isset($operation->from)) {
                     throw new Exception('Missing "from" in operation data');

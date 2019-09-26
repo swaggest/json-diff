@@ -48,6 +48,7 @@ class JsonValueReplace
             }
         }
 
+        /** @var string[] $originalKeys */
         $originalKeys = $data instanceof \stdClass ? get_object_vars($data) : $data;
 
         if ($check) {
