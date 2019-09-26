@@ -392,6 +392,11 @@ class JsonDiff
         return is_array($new) ? $newOrdered : (object)$newOrdered;
     }
 
+    /**
+     * @param array $original
+     * @param array $new
+     * @return array
+     */
     private function rearrangeArray(array $original, array $new)
     {
         $first = reset($original);
@@ -412,7 +417,7 @@ class JsonDiff
 
             $keyIsUnique = true;
             $uniqueIdx = array();
-            foreach ($original as $item) {
+            foreach ($original as $idx => $item) {
                 if (!$item instanceof \stdClass) {
                     return $new;
                 }
@@ -430,7 +435,7 @@ class JsonDiff
                     $keyIsUnique = false;
                     break;
                 }
-                $uniqueIdx[$value] = true;
+                $uniqueIdx[$value] = $idx;
             }
 
             if ($keyIsUnique) {
@@ -439,43 +444,54 @@ class JsonDiff
             }
         }
 
-        if ($uniqueKey) {
-            $newIdx = array();
-            foreach ($new as $item) {
-                if (!$item instanceof \stdClass) {
-                    return $new;
-                }
-
-                if (!property_exists($item, $uniqueKey)) {
-                    return $new;
-                }
-
-                $value = $item->$uniqueKey;
-
-                if ($value instanceof \stdClass || is_array($value)) {
-                    return $new;
-                }
-
-                if (isset($newIdx[$value])) {
-                    return $new;
-                }
-
-                $newIdx[$value] = $item;
-            }
-
-            $newRearranged = array();
-            foreach ($uniqueIdx as $key => $item) {
-                if (isset($newIdx[$key])) {
-                    $newRearranged [] = $newIdx[$key];
-                    unset($newIdx[$key]);
-                }
-            }
-            foreach ($newIdx as $item) {
-                $newRearranged [] = $item;
-            }
-            return $newRearranged;
+        if (!$uniqueKey) {
+            return $new;
         }
 
-        return $new;
+        $newRearranged = [];
+        $changedItems = [];
+
+        foreach ($new as $item) {
+            if (!$item instanceof \stdClass) {
+                return $new;
+            }
+
+            if (!property_exists($item, $uniqueKey)) {
+                return $new;
+            }
+
+            $value = $item->$uniqueKey;
+
+            if ($value instanceof \stdClass || is_array($value)) {
+                return $new;
+            }
+
+
+            if (isset($uniqueIdx[$value])) {
+                $idx = $uniqueIdx[$value];
+                // Abandon rearrangement if key is not unique in new array.
+                if (isset($newRearranged[$idx])) {
+                    return $new;
+                }
+
+                $newRearranged[$idx] = $item;
+            } else {
+                $changedItems[] = $item;
+            }
+
+            $newIdx[$value] = $item;
+        }
+
+        $idx = 0;
+        foreach ($changedItems as $item) {
+            while (array_key_exists($idx, $newRearranged)) {
+                $idx++;
+            }
+            $newRearranged[$idx] = $item;
+        }
+
+        ksort($newRearranged);
+        $newRearranged = array_values($newRearranged);
+        return $newRearranged;
     }
 }
