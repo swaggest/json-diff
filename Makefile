@@ -1,9 +1,32 @@
-phar:
-	composer require php-yaoi/php-yaoi:^1;composer install --no-dev;rm -rf tests/;rm ./json-diff;rm ./json-diff.tar.gz;phar-composer build;mv ./json-diff.phar ./json-diff;tar -zcvf ./json-diff.tar.gz ./json-diff;git reset --hard;composer install
+PHPSTAN_VERSION ?= 0.11.15
+PHPBENCH_VERSION ?= 0.16.10
 
-docker56-composer-update:
-	test -f ./composer.phar || wget https://getcomposer.org/composer.phar
-	docker run --rm -v $$(pwd):/code php:5.6-cli bash -c "apt-get update;apt-get install -y unzip;cd /code;php composer.phar update --prefer-source"
+deps:
+	@git submodule init && git submodule update
 
-docker56-test:
-	docker run --rm -v $$(pwd):/code -w /code php:5.6-cli php vendor/bin/phpunit
+lint:
+	@test -f ${HOME}/.cache/composer/phpstan-${PHPSTAN_VERSION}.phar || (mkdir -p ${HOME}/.cache/composer/ && wget https://github.com/phpstan/phpstan/releases/download/${PHPSTAN_VERSION}/phpstan.phar -O ${HOME}/.cache/composer/phpstan-${PHPSTAN_VERSION}.phar)
+	@php $$HOME/.cache/composer/phpstan-${PHPSTAN_VERSION}.phar analyze -l 7 -c phpstan.neon ./src
+
+docker-lint:
+	@docker run -v $$PWD:/app --rm phpstan/phpstan analyze -l 7 -c phpstan.neon ./src
+
+test:
+	@php -derror_reporting="E_ALL & ~E_DEPRECATED" vendor/bin/phpunit --configuration phpunit.xml
+
+test-coverage:
+	@php -derror_reporting="E_ALL & ~E_DEPRECATED" -dzend_extension=xdebug.so vendor/bin/phpunit --configuration phpunit.xml --coverage-text --coverage-clover=coverage.xml
+
+phpbench:
+	@test -f ${HOME}/.cache/composer/phpbench-${PHPBENCH_VERSION}.phar || (mkdir -p ${HOME}/.cache/composer/ && wget https://github.com/phpbench/phpbench/releases/download/${PHPBENCH_VERSION}/phpbench.phar -O ${HOME}/.cache/composer/phpbench-${PHPBENCH_VERSION}.phar)
+
+bench: phpbench
+	@php $$HOME/.cache/composer/phpbench-${PHPBENCH_VERSION}.phar run benchmarks --tag=candidate --progress=travis --bootstrap=vendor/autoload.php --revs=50 --iterations=5 --retry-threshold=3 --dump-file=phpbench-candidate.xml
+
+bench-master: phpbench
+	@git checkout --detach && git fetch origin '+refs/heads/master:refs/heads/master' && git checkout master -- ./src
+	@composer install --dev --no-interaction --prefer-dist
+	@php $$HOME/.cache/composer/phpbench-${PHPBENCH_VERSION}.phar run benchmarks --tag=master --progress=none --bootstrap=vendor/autoload.php --revs=50 --iterations=5 --retry-threshold=3 --dump-file=phpbench-master.xml
+
+bench-compare: phpbench
+	@php $$HOME/.cache/composer/phpbench-${PHPBENCH_VERSION}.phar report --file phpbench-master.xml --file phpbench-candidate.xml --report='generator: "table", cols: [ "set" ], compare: "tag", compare_fields: ["mean"], break: ["benchmark"]'

@@ -128,9 +128,54 @@ JSON;
         $this->assertSame($expectedJson, json_encode($m->getRearranged(), JSON_PRETTY_PRINT));
     }
 
-    public function testRearrangeNoUnique()
+    function testRearrangeKeepOriginal()
     {
+        $old = json_decode('[
+          {
+            "type": "string",
+            "name": "qp1",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "qp",
+            "in": "query"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UsecaseSampleInput"
+            },
+            "required": true
+          }
+        ]');
 
+        $new = json_decode('[
+          {
+            "type": "string",
+            "name": "qp1",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "qp2",
+            "in": "query"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UsecaseSampleInput"
+            },
+            "required": true
+          }
+        ]');
+
+        $m = new JsonDiff($old, $new, JsonDiff::REARRANGE_ARRAYS);
+        $this->assertSame(
+            json_encode($new, JSON_PRETTY_PRINT),
+            json_encode($m->getRearranged(), JSON_PRETTY_PRINT)
+        );
     }
-
 }
