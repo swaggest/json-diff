@@ -4,6 +4,8 @@
 /tests export-ignore
 /stubs export-ignore
 /tools export-ignore
+/benchmarks export-ignore
+/composer.lock export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.gitmodules export-ignore
