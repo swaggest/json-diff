@@ -69,6 +69,9 @@ Options can be combined, e.g. `JsonDiff::REARRANGE_ARRAYS + JsonDiff::STOP_ON_DI
 
 On created object you have several handy methods.
 
+#### `getDiffCnt`
+Returns total number of differences
+
 #### `getPatch`
 Returns [`JsonPatch`](#jsonpatch) of difference
 
