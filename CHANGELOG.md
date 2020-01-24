@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.3] - 2020-01-24
+
+### Fixed
+- Merge patch was not replacing partially different arrays.
+
 ## [3.7.2] - 2019-10-23
 
 ### Added
@@ -30,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Compatibility option to `TOLERATE_ASSOCIATIVE_ARRAYS` that mimic JSON objects.
 
+[3.7.3]: https://github.com/swaggest/json-diff/compare/v3.7.2...v3.7.3
 [3.7.2]: https://github.com/swaggest/json-diff/compare/v3.7.1...v3.7.2
 [3.7.1]: https://github.com/swaggest/json-diff/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/swaggest/json-diff/compare/v3.6.0...v3.7.0

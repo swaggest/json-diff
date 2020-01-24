@@ -323,6 +323,7 @@ class JsonDiff
         }
 
         $isUriFragment = (bool)($this->options & self::JSON_URI_FRAGMENT_ID);
+        $diffCnt = $this->addedCnt + $this->modifiedCnt + $this->removedCnt;
         foreach ($originalKeys as $key => $originalValue) {
             if ($this->options & self::STOP_ON_DIFF) {
                 if ($this->modifiedCnt || $this->addedCnt || $this->removedCnt) {
@@ -364,6 +365,10 @@ class JsonDiff
             }
             $this->path = $path;
             $this->pathItems = $pathItems;
+        }
+
+        if ($merge && $isArray && $this->addedCnt + $this->modifiedCnt + $this->removedCnt > $diffCnt) {
+            JsonPointer::add($this->merge, $this->pathItems, $new);
         }
 
         // additions

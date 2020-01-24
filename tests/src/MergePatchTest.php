@@ -289,5 +289,20 @@ JSON
 
     }
 
+    public function testComplex()
+    {
+        $original = json_decode(file_get_contents(__DIR__ . '/../assets/original.json'));
+        $new = json_decode(file_get_contents(__DIR__ . '/../assets/new.json'));
+
+        $diff = new JsonDiff($original, $new);
+        $mergePatch = $diff->getMergePatch();
+        $mergePatchJson = json_encode($mergePatch, JSON_UNESCAPED_SLASHES + JSON_PRETTY_PRINT);
+
+        $this->assertEquals(file_get_contents(__DIR__ . '/../assets/merge.json') , $mergePatchJson);
+
+        JsonMergePatch::apply($original, $mergePatch);
+        $this->assertEquals($new, $original);
+    }
+
 
 }
