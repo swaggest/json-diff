@@ -134,7 +134,7 @@ class JsonPointer
                 } else {
                     if ($flags & self::RECURSIVE_KEY_CREATION && $ref === null) $ref = array();
                     if ('-' === $key) {
-                        $ref = &$ref[];
+                        $ref = &$ref[count($ref)];
                     } else {
                         if (false === $intKey) {
                             if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
@@ -282,7 +282,6 @@ class JsonPointer
                 unset($parent->$refKey);
             } else {
                 $isAssociative = false;
-                $ff = $flags & self::TOLERATE_ASSOCIATIVE_ARRAYS;
                 if ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS) {
                     $i = 0;
                     foreach ($parent as $index => $value) {
