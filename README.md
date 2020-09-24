@@ -57,7 +57,7 @@ $r = new JsonDiff(
 ```
 
 Available options:
- * `REARRANGE_ARRAYS` is an option to enable arrays rearrangement to minimize the difference.
+ * `REARRANGE_ARRAYS` is an option to enable [arrays rearrangement](#arraysrearrangement) to minimize the difference.
  * `STOP_ON_DIFF` is an option to improve performance by stopping comparison when a difference is found.
  * `JSON_URI_FRAGMENT_ID` is an option to use URI Fragment Identifier Representation (example: "#/c%25d"). If not set default JSON String Representation (example: "/c%d").
  * `SKIP_JSON_PATCH` is an option to improve performance by not building JsonPatch for this diff.
@@ -66,8 +66,6 @@ Available options:
  * `COLLECT_MODIFIED_DIFF` is an option to enable [getModifiedDiff](#getmodifieddiff).
 
 Options can be combined, e.g. `JsonDiff::REARRANGE_ARRAYS + JsonDiff::STOP_ON_DIFF`.
-
-On created object you have several handy methods.
 
 #### `getDiffCnt`
 Returns total number of differences
@@ -247,6 +245,40 @@ $this->assertEquals($diff->getRearranged(), $original);
 Due to magical methods and other restrictions PHP classes can not be reliably mapped to/from JSON objects.
 There is support for objects of PHP classes in `JsonPointer` with limitations:
 * `null` is equal to non-existent
+
+## Arrays Rearrangement
+
+When `JsonDiff::REARRANGE_ARRAYS` option is enabled, array items are ordered to match the original array.
+
+If arrays contain homogenous objects, and those objects have a common property with unique values, array is
+ordered to match placement of items with same value of such property in the original array.
+
+Example:
+original
+```json
+[{"name": "Alex", "height": 180},{"name": "Joe", "height": 179},{"name": "Jane", "height": 165}]
+```
+vs new
+```json
+[{"name": "Joe", "height": 179},{"name": "Jane", "height": 168},{"name": "Alex", "height": 180}]
+```
+would produce a patch:
+```json
+[{"value":165,"op":"test","path":"/2/height"},{"value":168,"op":"replace","path":"/2/height"}]
+```
+
+If qualifying indexing property is not found, rearrangement is done based on items equality.
+
+Example:
+original
+```json
+{"data": [{"A": 1, "C": [1, 2, 3]}, {"B": 2}]}
+```
+vs new
+```json
+{"data": [{"B": 2}, {"A": 1, "C": [3, 2, 1]}]}
+```
+would produce no difference.
 
 ## CLI tool
 

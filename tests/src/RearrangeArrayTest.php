@@ -178,4 +178,36 @@ JSON;
             json_encode($m->getRearranged(), JSON_PRETTY_PRINT)
         );
     }
+
+    public function testEqualItems()
+    {
+        $diff = new \Swaggest\JsonDiff\JsonDiff(
+            json_decode('{"data": [{"A": 1, "C": [1,2,3]},{"B": 2}]}'),
+            json_decode('{"data": [{"B": 2},{"A": 1, "C": [3,2,1]}]}'),
+            JsonDiff::REARRANGE_ARRAYS);
+
+        $this->assertEmpty($diff->getDiffCnt());
+    }
+
+    public function testEqualItemsDiff()
+    {
+        $diff = new \Swaggest\JsonDiff\JsonDiff(
+            json_decode('{"data": [{"A": 1, "C": [1,2,3,4]},{"B": 2}]}'),
+            json_decode('{"data": [{"B": 2},{"A": 1, "C": [5,3,2,1]}]}'),
+            JsonDiff::REARRANGE_ARRAYS);
+
+        $this->assertEquals('[{"value":4,"op":"test","path":"/data/0/C/3"},{"value":5,"op":"replace","path":"/data/0/C/3"}]',
+            json_encode($diff->getPatch(), JSON_UNESCAPED_SLASHES));
+    }
+
+    public function testExample()
+    {
+        $diff = new \Swaggest\JsonDiff\JsonDiff(
+            json_decode('[{"name": "Alex", "height": 180},{"name": "Joe", "height": 179},{"name": "Jane", "height": 165}]'),
+            json_decode('[{"name": "Joe", "height": 179},{"name": "Jane", "height": 168},{"name": "Alex", "height": 180}]'),
+            JsonDiff::REARRANGE_ARRAYS);
+
+        $this->assertEquals('[{"value":165,"op":"test","path":"/2/height"},{"value":168,"op":"replace","path":"/2/height"}]',
+            json_encode($diff->getPatch(), JSON_UNESCAPED_SLASHES));
+    }
 }
