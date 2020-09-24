@@ -47,8 +47,6 @@ class JsonDiff
 
 
     private $options = 0;
-    private $original;
-    private $new;
 
     /**
      * @var mixed Merge patch container
@@ -80,6 +78,12 @@ class JsonDiff
     /** @var JsonPatch */
     private $jsonPatch;
 
+    /** @var JsonHash */
+    private $jsonHashOriginal;
+
+    /** @var JsonHash */
+    private $jsonHashNew;
+
     /**
      * @param mixed $original
      * @param mixed $new
@@ -92,15 +96,13 @@ class JsonDiff
             $this->jsonPatch = new JsonPatch();
         }
 
-        $this->original = $original;
-        $this->new = $new;
         $this->options = $options;
 
         if ($options & self::JSON_URI_FRAGMENT_ID) {
             $this->path = '#';
         }
 
-        $this->rearranged = $this->rearrange();
+        $this->rearranged = $this->process($original, $new);
         if (($new !== null) && $this->merge === null) {
             $this->merge = new \stdClass();
         }
@@ -241,14 +243,6 @@ class JsonDiff
 
     }
 
-    /**
-     * @return array|null|object|\stdClass
-     * @throws Exception
-     */
-    private function rearrange()
-    {
-        return $this->process($this->original, $this->new);
-    }
 
     /**
      * @param mixed $original
@@ -406,7 +400,7 @@ class JsonDiff
     {
         $first = reset($original);
         if (!$first instanceof \stdClass) {
-            return $new;
+            return $this->rearrangeEqualItems($original, $new);
         }
 
         $uniqueKey = false;
@@ -450,7 +444,7 @@ class JsonDiff
         }
 
         if (!$uniqueKey) {
-            return $new;
+            return $this->rearrangeEqualItems($original, $new);
         }
 
         $newRearranged = [];
@@ -498,5 +492,37 @@ class JsonDiff
         ksort($newRearranged);
         $newRearranged = array_values($newRearranged);
         return $newRearranged;
+    }
+
+    private function rearrangeEqualItems(array $original, array $new)
+    {
+        if ($this->jsonHashOriginal === null) {
+            $this->jsonHashOriginal = new JsonHash($this->options);
+            $this->jsonHashNew = new JsonHash($this->options);
+        }
+
+        $origIdx = [];
+        foreach ($original as $i => $item) {
+            $origIdx[$i] = $this->jsonHashOriginal->xorHash($item);
+        }
+
+        $newIdx = [];
+        foreach ($new as $i => $item) {
+            $hash = $this->jsonHashNew->xorHash($item);
+            $newIdx[$hash][] = $i;
+        }
+
+        $rearranged = $new;
+        foreach ($origIdx as $i => $hash) {
+            if (empty($newIdx[$hash])) {
+                continue;
+            }
+
+            $j = array_shift($newIdx[$hash]);
+            $rearranged[$i] = $new[$j];
+            $rearranged[$j] = $new[$i];
+        }
+
+        return $rearranged;
     }
 }
