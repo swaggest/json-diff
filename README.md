@@ -57,7 +57,7 @@ $r = new JsonDiff(
 ```
 
 Available options:
- * `REARRANGE_ARRAYS` is an option to enable [arrays rearrangement](#arraysrearrangement) to minimize the difference.
+ * `REARRANGE_ARRAYS` is an option to enable [arrays rearrangement](#arrays-rearrangement) to minimize the difference.
  * `STOP_ON_DIFF` is an option to improve performance by stopping comparison when a difference is found.
  * `JSON_URI_FRAGMENT_ID` is an option to use URI Fragment Identifier Representation (example: "#/c%25d"). If not set default JSON String Representation (example: "/c%d").
  * `SKIP_JSON_PATCH` is an option to improve performance by not building JsonPatch for this diff.
