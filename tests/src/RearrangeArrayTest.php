@@ -199,4 +199,15 @@ JSON;
         $this->assertEquals('[{"value":4,"op":"test","path":"/data/0/C/3"},{"value":5,"op":"replace","path":"/data/0/C/3"}]',
             json_encode($diff->getPatch(), JSON_UNESCAPED_SLASHES));
     }
+
+    public function testExample()
+    {
+        $diff = new \Swaggest\JsonDiff\JsonDiff(
+            json_decode('[{"name": "Alex", "height": 180},{"name": "Joe", "height": 179},{"name": "Jane", "height": 165}]'),
+            json_decode('[{"name": "Joe", "height": 179},{"name": "Jane", "height": 168},{"name": "Alex", "height": 180}]'),
+            JsonDiff::REARRANGE_ARRAYS);
+
+        $this->assertEquals('[{"value":165,"op":"test","path":"/2/height"},{"value":168,"op":"replace","path":"/2/height"}]',
+            json_encode($diff->getPatch(), JSON_UNESCAPED_SLASHES));
+    }
 }
