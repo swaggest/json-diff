@@ -210,4 +210,178 @@ JSON;
         $this->assertEquals('[{"value":165,"op":"test","path":"/2/height"},{"value":168,"op":"replace","path":"/2/height"}]',
             json_encode($diff->getPatch(), JSON_UNESCAPED_SLASHES));
     }
+
+    public function testReplacement()
+    {
+        $ex1 = json_decode(<<<'JSON'
+{
+  "attribute": {
+    "name": ".UpwardPropagation - Prescriptions - Log-Ranges",
+    "attribute": ".UpwardPropagation - Prescriptions - Log-Ranges",
+    "dimension": ".UpwardPropagation - Prescriptions",
+    "object": "Patients"
+  },
+  "selectedStates": [
+    "]200,500]",
+    "]500,1000]",
+    "]20,50]",
+    "]100,200]",
+    "]5000,10000]",
+    "]5,10]",
+    "]1,2]",
+    "]10,20]",
+    "null",
+    "]10000,oo[",
+    "]2,5]",
+    "]0,1]",
+    "]1000,2000]",
+    "]50,100]",
+    "]2000,5000]"
+  ]
+}
+JSON
+        );
+
+        $ex2 = json_decode(<<<'JSON'
+{
+  "attribute": {
+    "name": ".UpwardPropagation - Prescriptions - Log-Ranges",
+    "attribute": ".UpwardPropagation - Prescriptions - Log-Ranges",
+    "dimension": ".UpwardPropagation - Prescriptions",
+    "object": "Patients"
+  },
+  "selectedStates": [
+    "]2000,5000]",
+    "]2,5]",
+    "]20,50]",
+    "]1,2]",
+    "]10000,oo[",
+    "]200,500]",
+    "]50,100]",
+    "]500,1000]",
+    "]5,10]",
+    "]10,20]",
+    "null",
+    "]0,1]",
+    "]1000,2000]",
+    "]5000,10000]",
+    "]100,200]"
+  ]
+}
+JSON
+        );
+
+        $diff = new JsonDiff($ex1, $ex2, JsonDiff::REARRANGE_ARRAYS);
+        $ex2r = $diff->getRearranged();
+        $missingItems = [];
+        foreach ($ex2->selectedStates as $i => $item) {
+            if (!in_array($item, $ex2r->selectedStates)) {
+                $missingItems[$i] = $item;
+            }
+        }
+
+        $this->assertEmpty($missingItems, json_encode($ex2r, JSON_UNESCAPED_SLASHES));
+        $this->assertEquals(
+            json_encode($ex1, JSON_UNESCAPED_SLASHES+JSON_PRETTY_PRINT),
+            json_encode($ex2r, JSON_UNESCAPED_SLASHES+JSON_PRETTY_PRINT)
+        );
+    }
+
+    public function testReplacementChanges()
+    {
+        $ex1 = json_decode(<<<'JSON'
+{
+  "attribute": {
+    "name": ".UpwardPropagation - Prescriptions - Log-Ranges",
+    "attribute": ".UpwardPropagation - Prescriptions - Log-Ranges",
+    "dimension": ".UpwardPropagation - Prescriptions",
+    "object": "Patients"
+  },
+  "selectedStates": [
+    "]200,500]",
+    "]500,1000]",
+    "]100,200]",
+    "]5000,10000]",
+    "]5,10]",
+    "]1,2]",
+    "]10,20]",
+    "null",
+    "]10000,oo[",
+    "]2,5]",
+    "]0,1]",
+    "]1000,2000]",
+    "]50,100]",
+    "]2000,5000]"
+  ]
+}
+JSON
+        );
+
+        $ex2 = json_decode(<<<'JSON'
+{
+  "attribute": {
+    "name": ".UpwardPropagation - Prescriptions - Log-Ranges",
+    "attribute": ".UpwardPropagation - Prescriptions - Log-Ranges",
+    "dimension": ".UpwardPropagation - Prescriptions",
+    "object": "Patients"
+  },
+  "selectedStates": [
+    "]2000,5000]",
+    "]2,5]",
+    "]20,50]",
+    "]1,2]",
+    "]10000,oo[",
+    "]200,500]",
+    "]50,100]",
+    "]500,1000]",
+    "]5,10]",
+    "]10,20]",
+    "]0,1]",
+    "]1000,2000]",
+    "]5000,10000]",
+    "]100,200]"
+  ]
+}
+JSON
+        );
+
+        $diff = new JsonDiff($ex1, $ex2, JsonDiff::REARRANGE_ARRAYS);
+        $ex2r = $diff->getRearranged();
+        $missingItems = [];
+        foreach ($ex2->selectedStates as $i => $item) {
+            if (!in_array($item, $ex2r->selectedStates)) {
+                $missingItems[$i] = $item;
+            }
+        }
+
+        $this->assertEmpty($missingItems, json_encode($ex2r, JSON_UNESCAPED_SLASHES));
+        $this->assertEquals(
+            '{
+    "attribute": {
+        "name": ".UpwardPropagation - Prescriptions - Log-Ranges",
+        "attribute": ".UpwardPropagation - Prescriptions - Log-Ranges",
+        "dimension": ".UpwardPropagation - Prescriptions",
+        "object": "Patients"
+    },
+    "selectedStates": [
+        "]200,500]",
+        "]500,1000]",
+        "]100,200]",
+        "]5000,10000]",
+        "]5,10]",
+        "]1,2]",
+        "]10,20]",
+        "]20,50]",
+        "]10000,oo[",
+        "]2,5]",
+        "]0,1]",
+        "]1000,2000]",
+        "]50,100]",
+        "]2000,5000]"
+    ]
+}',
+            json_encode($ex2r, JSON_UNESCAPED_SLASHES+JSON_PRETTY_PRINT)
+        );
+    }
+
 }

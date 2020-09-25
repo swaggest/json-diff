@@ -503,26 +503,40 @@ class JsonDiff
 
         $origIdx = [];
         foreach ($original as $i => $item) {
-            $origIdx[$i] = $this->jsonHashOriginal->xorHash($item);
+            $hash = $this->jsonHashOriginal->xorHash($item);
+            $origIdx[$hash][] = $i;
         }
 
         $newIdx = [];
         foreach ($new as $i => $item) {
             $hash = $this->jsonHashNew->xorHash($item);
-            $newIdx[$hash][] = $i;
+            $newIdx[$i] = $hash;
         }
 
-        $rearranged = $new;
-        foreach ($origIdx as $i => $hash) {
-            if (empty($newIdx[$hash])) {
-                continue;
+        $newRearranged = [];
+        $changedItems = [];
+        foreach ($newIdx as $i => $hash) {
+            if (!empty($origIdx[$hash])) {
+                $j = array_shift($origIdx[$hash]);
+
+                $newRearranged[$j] = $new[$i];
+            } else {
+                $changedItems []= $new[$i];
             }
 
-            $j = array_shift($newIdx[$hash]);
-            $rearranged[$i] = $new[$j];
-            $rearranged[$j] = $new[$i];
         }
 
-        return $rearranged;
+        $idx = 0;
+        foreach ($changedItems as $item) {
+            while (array_key_exists($idx, $newRearranged)) {
+                $idx++;
+            }
+            $newRearranged[$idx] = $item;
+        }
+
+        ksort($newRearranged);
+        $newRearranged = array_values($newRearranged);
+
+        return $newRearranged;
     }
 }
