@@ -6,6 +6,8 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/swaggest/json-diff/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/swaggest/json-diff/?branch=master)
 [![Code Climate](https://codeclimate.com/github/swaggest/json-diff/badges/gpa.svg)](https://codeclimate.com/github/swaggest/json-diff)
 [![Code Coverage](https://scrutinizer-ci.com/g/swaggest/json-diff/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/swaggest/json-diff/code-structure/master/code-coverage)
+[![time tracker](https://wakatime.com/badge/github/swaggest/json-diff.svg)](https://wakatime.com/badge/github/swaggest/json-diff)
+
 
 ## Purpose
 
