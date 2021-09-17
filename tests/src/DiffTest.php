@@ -34,7 +34,7 @@ class DiffTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, $diff->getModifiedCnt());
 
         $diff = new JsonDiff($original, $new, JsonDiff::REARRANGE_ARRAYS);
-        $this->assertEquals('[{"op":"remove","path":"/root/a"},{"value":2,"op":"test","path":"/root/b"},{"value":3,"op":"replace","path":"/root/b"},{"value":4,"op":"add","path":"/root/c"}]',
+        $this->assertJsonStringEqualsJsonString('[{"op":"remove","path":"/root/a"},{"value":2,"op":"test","path":"/root/b"},{"value":3,"op":"replace","path":"/root/b"},{"value":4,"op":"add","path":"/root/c"}]',
             json_encode($diff->getPatch(), JSON_UNESCAPED_SLASHES));
         $this->assertSame(3, $diff->getDiffCnt());
         $this->assertSame(1, $diff->getAddedCnt());

@@ -1,4 +1,4 @@
-PHPSTAN_VERSION ?= 0.11.19
+PHPSTAN_VERSION ?= 0.12.99
 PHPBENCH_VERSION ?= 0.16.10
 
 deps:
@@ -11,11 +11,17 @@ lint:
 docker-lint:
 	@docker run -v $$PWD:/app --rm phpstan/phpstan analyze -l 7 -c phpstan.neon ./src
 
+docker-test-new:
+	@docker run -v $$PWD:/app -w /app --rm php:8.1.0RC1-zts-buster php vendor/bin/phpunit --configuration phpunit.xml
+
+docker-test-old:
+	@docker run -v $$PWD:/app -w /app --rm php:5.4-cli php vendor/bin/phpunit --configuration phpunit.xml
+
 test:
-	@php -derror_reporting="E_ALL & ~E_DEPRECATED" vendor/bin/phpunit --configuration phpunit.xml
+	@php vendor/bin/phpunit --configuration phpunit.xml
 
 test-coverage:
-	@php -derror_reporting="E_ALL & ~E_DEPRECATED" -dzend_extension=xdebug.so vendor/bin/phpunit --configuration phpunit.xml --coverage-text --coverage-clover=coverage.xml
+	@php -dzend_extension=xdebug.so vendor/bin/phpunit --configuration phpunit.xml --coverage-text --coverage-clover=coverage.xml
 
 phpbench:
 	@test -f ${HOME}/.cache/composer/phpbench-${PHPBENCH_VERSION}.phar || (mkdir -p ${HOME}/.cache/composer/ && wget https://github.com/phpbench/phpbench/releases/download/${PHPBENCH_VERSION}/phpbench.phar -O ${HOME}/.cache/composer/phpbench-${PHPBENCH_VERSION}.phar)

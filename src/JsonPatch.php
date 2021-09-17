@@ -55,7 +55,7 @@ class JsonPatch implements \JsonSerializable
     {
         $result = new JsonPatch();
         foreach ($data as $operation) {
-            /** @var OpPath|OpPathValue|OpPathFrom $operation */
+            /** @var OpPath|OpPathValue|OpPathFrom|array $operation */
             if (is_array($operation)) {
                 $operation = (object)$operation;
             }
@@ -124,6 +124,7 @@ class JsonPatch implements \JsonSerializable
         return $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return self::export($this);

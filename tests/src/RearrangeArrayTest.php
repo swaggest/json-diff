@@ -196,7 +196,7 @@ JSON;
             json_decode('{"data": [{"B": 2},{"A": 1, "C": [5,3,2,1]}]}'),
             JsonDiff::REARRANGE_ARRAYS);
 
-        $this->assertEquals('[{"value":4,"op":"test","path":"/data/0/C/3"},{"value":5,"op":"replace","path":"/data/0/C/3"}]',
+        $this->assertJsonStringEqualsJsonString('[{"value":4,"op":"test","path":"/data/0/C/3"},{"value":5,"op":"replace","path":"/data/0/C/3"}]',
             json_encode($diff->getPatch(), JSON_UNESCAPED_SLASHES));
     }
 
@@ -207,7 +207,7 @@ JSON;
             json_decode('[{"name": "Joe", "height": 179},{"name": "Jane", "height": 168},{"name": "Alex", "height": 180}]'),
             JsonDiff::REARRANGE_ARRAYS);
 
-        $this->assertEquals('[{"value":165,"op":"test","path":"/2/height"},{"value":168,"op":"replace","path":"/2/height"}]',
+        $this->assertJsonStringEqualsJsonString('[{"value":165,"op":"test","path":"/2/height"},{"value":168,"op":"replace","path":"/2/height"}]',
             json_encode($diff->getPatch(), JSON_UNESCAPED_SLASHES));
     }
 

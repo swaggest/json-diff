@@ -1,0 +1,8 @@
+parameters:
+	inferPrivatePropertyTypeFromConstructor: true
+	checkMissingIterableValueType: false
+	checkGenericClassInNonGenericObjectType: false
+	ignoreErrors:
+		- '#has no return typehint specified#'
+		- '#with no typehint specified#'
+		- '#has no typehint specified#'

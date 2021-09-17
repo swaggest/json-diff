@@ -19,7 +19,7 @@ class Issue6Test extends \PHPUnit_Framework_TestCase
         $diff = new JsonDiff($json1, $json2);
         $patch = $diff->getPatch();
 
-        $this->assertSame(<<<'JSON'
+        $this->assertJsonStringEqualsJsonString(<<<'JSON'
 [
     {
         "value": "a",
