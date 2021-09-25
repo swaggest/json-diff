@@ -1,0 +1,615 @@
+{
+ "session":[
+  {
+   "element":{
+    "cachingEnabled":true,
+    "focusObject":{
+     "childObjects":[
+      {
+       "dimensions":[
+        {
+         "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+         "dimensionName":"patId","isObjectKey":true,"isPrimaryKey":false,"objectKeyLevel":0,
+         "type":"CATEGORIAL"
+        },
+        {
+         "annotations":{"semanticType":"TimeInstant"},
+         "attributes":[{"attributeName":"Date","hierarchyLevelNames":["Years","Months","Days"]}],
+         "configuration":{"dimensionClass":"NumericDimension","type":"LONG"},"dimensionName":"Date",
+         "isObjectKey":false,"isPrimaryKey":false,"type":"LONG"
+        },
+        {
+         "attributes":[{"attributeName":"Costs (est.)","hierarchyLevelNames":["Costs (est.)"]}],
+         "configuration":{"dimensionClass":"NumericDimension","type":"FLOAT"},
+         "dimensionName":"Costs (est.)","isObjectKey":false,"isPrimaryKey":false,"type":"FLOAT"
+        },
+        {
+         "attributes":[
+          {
+           "attributeName":"pzn",
+           "hierarchyLevelNames":["Level 1","Level 2","Level 3","Level 4","Level 5","PZN"]
+          }
+         ],
+         "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+         "dimensionName":"PZN","isObjectKey":false,"isPrimaryKey":false,"type":"CATEGORIAL"
+        }
+       ],
+       "inFocusDimensions":["patId"],"objectName":"Prescriptions","propagateSelectionsUpward":true
+      },
+      {
+       "childObjects":[
+        {
+         "dimensions":[
+          {
+           "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+           "dimensionName":"patId","isObjectKey":true,"isPrimaryKey":false,"objectKeyLevel":0,
+           "type":"CATEGORIAL"
+          },
+          {
+           "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+           "dimensionName":"hospId","isObjectKey":true,"isPrimaryKey":false,"objectKeyLevel":1,
+           "type":"CATEGORIAL"
+          },
+          {
+           "annotations":{"semanticType":"TimeInstant"},
+           "attributes":[{"attributeName":"PrescDate","hierarchyLevelNames":["Years","Months","Days"]}],
+           "configuration":{"dimensionClass":"NumericDimension","type":"LONG"},
+           "dimensionName":"PrescDate","isObjectKey":false,"isPrimaryKey":false,"type":"LONG"
+          },
+          {
+           "attributes":[{"attributeName":"Costs","hierarchyLevelNames":["Costs"]}],
+           "configuration":{"dimensionClass":"NumericDimension","type":"FLOAT"},
+           "dimensionName":"Costs","isObjectKey":false,"isPrimaryKey":false,"type":"FLOAT"
+          },
+          {
+           "attributes":[
+            {
+             "attributeName":"pzn",
+             "hierarchyLevelNames":["Level 1","Level 2","Level 3","Level 4","Level 5","PZN"]
+            }
+           ],
+           "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+           "dimensionName":"PZN","isObjectKey":false,"isPrimaryKey":false,"type":"CATEGORIAL"
+          }
+         ],
+         "inFocusDimensions":["patId","hospId"],"objectName":"Hosp.-Prescriptions",
+         "propagateSelectionsUpward":true
+        },
+        {
+         "dimensions":[
+          {
+           "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+           "dimensionName":"patId","isObjectKey":true,"isPrimaryKey":false,"objectKeyLevel":0,
+           "type":"CATEGORIAL"
+          },
+          {
+           "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+           "dimensionName":"hospId","isObjectKey":true,"isPrimaryKey":false,"objectKeyLevel":1,
+           "type":"CATEGORIAL"
+          },
+          {
+           "annotations":{"semanticType":"TimeInstant"},
+           "attributes":[{"attributeName":"Date","hierarchyLevelNames":["Years","Months","Days"]}],
+           "configuration":{"dimensionClass":"NumericDimension","type":"LONG"},
+           "dimensionName":"Date","isObjectKey":false,"isPrimaryKey":false,"type":"LONG"
+          },
+          {
+           "attributes":[{"attributeName":"ICD","hierarchyLevelNames":["ICD"]}],
+           "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+           "dimensionName":"ICD","isObjectKey":false,"isPrimaryKey":false,"type":"CATEGORIAL"
+          }
+         ],
+         "inFocusDimensions":["patId","hospId"],"objectName":"Hosp.-Diagnoses",
+         "propagateSelectionsUpward":true
+        }
+       ],
+       "dimensions":[
+        {
+         "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+         "dimensionName":"hospId","isObjectKey":true,"isPrimaryKey":true,"objectKeyLevel":1,
+         "type":"CATEGORIAL"
+        },
+        {
+         "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+         "dimensionName":"patId","isObjectKey":true,"isPrimaryKey":false,"objectKeyLevel":0,
+         "type":"CATEGORIAL"
+        },
+        {
+         "annotations":{"semanticType":"TimeInstant"},
+         "attributes":[{"attributeName":"DateFrom","hierarchyLevelNames":["Years","Months","Days"]}],
+         "configuration":{"dimensionClass":"NumericDimension","type":"LONG"},
+         "dimensionName":"DateFrom","isObjectKey":false,"isPrimaryKey":false,"type":"LONG"
+        },
+        {
+         "annotations":{"semanticType":"TimeInstant"},
+         "attributes":[{"attributeName":"DateTo","hierarchyLevelNames":["Years","Months","Days"]}],
+         "configuration":{"dimensionClass":"NumericDimension","type":"LONG"},
+         "dimensionName":"DateTo","isObjectKey":false,"isPrimaryKey":false,"type":"LONG"
+        },
+        {
+         "attributes":[{"attributeName":"Length of Stay","hierarchyLevelNames":["lengthStay"]}],
+         "configuration":{"dimensionClass":"NumericDimension","type":"LONG"},
+         "dimensionName":"lengthStay","isObjectKey":false,"isPrimaryKey":false,"type":"LONG"
+        },
+        {
+         "attributes":[{"attributeName":"Is Null","hierarchyLevelNames":["Level 1"]}],
+         "configuration":{"dimensionClass":"NullRecordBooleanDimension","type":"BOOLEAN"},
+         "dimensionName":"Is Null","isObjectKey":false,"isPrimaryKey":false,"type":"BOOLEAN"
+        },
+        {
+         "attributes":[
+          {
+           "attributeName":".UpwardPropagation - Hosp.-Prescriptions - Log-Ranges",
+           "hierarchyLevelNames":[".UpwardPropagation - Hosp.-Prescriptions - Log-Ranges"]
+          }
+         ],
+         "configuration":{
+          "aggregation":{
+           "aggregationName":"# Hosp.-Prescriptions","aggregationType":"COUNT",
+           "complementMissingBranches":false,"object":"Hosp.-Prescriptions","type":"COUNT"
+          },
+          "dimensionClass":"AggregationDimension",
+          "selections":[
+           {
+            "attribute":{"attribute":"Costs","dimension":"Costs","name":"Costs","object":"Hosp.-Prescriptions"},
+            "selectedStates":["]2.0,5.0]"]
+           }
+          ],
+          "type":"LONG"
+         },
+         "dimensionName":".UpwardPropagation - Hosp.-Prescriptions",
+         "displayName":"# Hosp.-Prescriptions([selections on Hosp.-Prescriptions])",
+         "isObjectKey":false,"isPrimaryKey":false,"type":"LONG"
+        }
+       ],
+       "inFocusDimensions":["patId","hospId"],"objectName":"Hospitalizations",
+       "propagateSelectionsUpward":true
+      }
+     ],
+     "dimensions":[
+      {
+       "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+       "dimensionName":"Patient","isObjectKey":true,"isPrimaryKey":true,"objectKeyLevel":0,
+       "type":"CATEGORIAL"
+      },
+      {
+       "attributes":[{"attributeName":"Gender","hierarchyLevelNames":["Gender"]}],
+       "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+       "dimensionName":"Gender","isObjectKey":false,"isPrimaryKey":false,"type":"CATEGORIAL"
+      },
+      {
+       "attributes":[
+        {"attributeName":"DoB","hierarchyLevelNames":["Years","Months","Days"]},
+        {
+         "attributeName":"Age Group (20, 10, 5, 1)",
+         "hierarchyLevelNames":["Level 1","Level 2","Level 3","Level 4"]
+        },
+        {
+         "attributeName":"Age Group (Teenager, Retiree)",
+         "hierarchyLevelNames":["Level 1","Level 2"]
+        }
+       ],
+       "configuration":{"dimensionClass":"NumericDimension","type":"LONG"},"dimensionName":"DoB",
+       "isObjectKey":false,"isPrimaryKey":false,"type":"LONG"
+      },
+      {
+       "attributes":[{"attributeName":"Age","hierarchyLevelNames":["20-level","10-level","2-level"]}],
+       "configuration":{"dimensionClass":"NumericDimension","type":"INT"},"dimensionName":"Age",
+       "isObjectKey":false,"isPrimaryKey":false,"type":"INT"
+      },
+      {
+       "attributes":[{"attributeName":"city","hierarchyLevelNames":["State","City","CityID"]}],
+       "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+       "dimensionName":"City","isObjectKey":false,"isPrimaryKey":false,"type":"CATEGORIAL"
+      },
+      {
+       "attributes":[{"attributeName":"Nation","hierarchyLevelNames":["Nation"]}],
+       "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+       "dimensionName":"Nation","isObjectKey":false,"isPrimaryKey":false,"type":"CATEGORIAL"
+      },
+      {
+       "attributes":[{"attributeName":"Died","hierarchyLevelNames":["Died"]}],
+       "configuration":{"dimensionClass":"CategorialDimension","type":"CATEGORIAL"},
+       "dimensionName":"Died","isObjectKey":false,"isPrimaryKey":false,"type":"CATEGORIAL"
+      },
+      {
+       "attributes":[{"attributeName":"marginalReturn","hierarchyLevelNames":["marginalReturn"]}],
+       "configuration":{"dimensionClass":"NumericDimension","type":"FLOAT"},
+       "dimensionName":"marginalReturn","isObjectKey":false,"isPrimaryKey":false,"type":"FLOAT"
+      },
+      {
+       "attributes":[{"attributeName":"Is Null","hierarchyLevelNames":["Level 1"]}],
+       "configuration":{"dimensionClass":"NullRecordBooleanDimension","type":"BOOLEAN"},
+       "dimensionName":"Is Null","isObjectKey":false,"isPrimaryKey":false,"type":"BOOLEAN"
+      },
+      {
+       "attributes":[
+        {
+         "attributeName":".UpwardPropagation - Hospitalizations - Log-Ranges",
+         "hierarchyLevelNames":[".UpwardPropagation - Hospitalizations - Log-Ranges"]
+        }
+       ],
+       "configuration":{
+        "aggregation":{
+         "aggregationName":"# Hospitalizations","aggregationType":"COUNT",
+         "complementMissingBranches":false,"object":"Hospitalizations","type":"COUNT"
+        },
+        "dimensionClass":"AggregationDimension",
+        "selections":[
+         {
+          "attribute":{
+           "attribute":"DateFrom","dimension":"DateFrom","name":"DateFrom",
+           "object":"Hospitalizations"
+          },
+          "selectedStates":["2018"]
+         },
+         {
+          "attribute":{
+           "attribute":".UpwardPropagation - Hosp.-Prescriptions - Log-Ranges",
+           "dimension":".UpwardPropagation - Hosp.-Prescriptions",
+           "name":".UpwardPropagation - Hosp.-Prescriptions - Log-Ranges",
+           "object":"Hospitalizations"
+          },
+          "selectedStates":[
+           "]5000,10000]","]1000,2000]","null","]200,500]","]2000,5000]","]500,1000]","]2,5]",
+           "]20,50]","]50,100]","]0,1]","]1,2]","]10,20]","]10000,oo[","]100,200]","]5,10]"
+          ]
+         }
+        ],
+        "type":"LONG"
+       },
+       "dimensionName":".UpwardPropagation - Hospitalizations",
+       "displayName":"# Hospitalizations([selections on Hospitalizations])","isObjectKey":false,
+       "isPrimaryKey":false,"type":"LONG"
+      }
+     ],
+     "inFocusDimensions":["Patient"],"objectName":"Patients","propagateSelectionsUpward":false
+    },
+    "globalSelections":[
+     {
+      "attribute":{"attribute":"Costs","dimension":"Costs","name":"Costs","object":"Hosp.-Prescriptions"},
+      "selectedStates":["]2.0,5.0]"]
+     },
+     {
+      "attribute":{"attribute":"DateFrom","dimension":"DateFrom","name":"DateFrom","object":"Hospitalizations"},
+      "selectedStates":["2018"]
+     },
+     {
+      "attribute":{
+       "attribute":".UpwardPropagation - Hosp.-Prescriptions - Log-Ranges",
+       "dimension":".UpwardPropagation - Hosp.-Prescriptions",
+       "name":".UpwardPropagation - Hosp.-Prescriptions - Log-Ranges","object":"Hospitalizations"
+      },
+      "selectedStates":[
+       "]5000,10000]","]1000,2000]","null","]200,500]","]2000,5000]","]500,1000]","]2,5]","]20,50]",
+       "]50,100]","]0,1]","]1,2]","]10,20]","]10000,oo[","]100,200]","]5,10]"
+      ]
+     },
+     {
+      "attribute":{"attribute":"Age","dimension":"Age","name":"Age","object":"Patients"},
+      "selectedStates":["20 - 39"]
+     },
+     {
+      "attribute":{
+       "attribute":".UpwardPropagation - Hospitalizations - Log-Ranges",
+       "dimension":".UpwardPropagation - Hospitalizations",
+       "name":".UpwardPropagation - Hospitalizations - Log-Ranges","object":"Patients"
+      },
+      "selectedStates":[
+       "]100,200]","]0,1]","]200,500]","]2000,5000]","]5,10]","]1000,2000]","]1,2]","null",
+       "]5000,10000]","]20,50]","]10,20]","]2,5]","]500,1000]","]50,100]","]10000,oo["
+      ]
+     }
+    ],
+    "logCalls":true,
+    "requests":[
+     {
+      "aggregations":[
+       {
+        "aggregationName":"# Hosp.-Prescriptions","aggregationType":"COUNT",
+        "complementMissingBranches":false,"object":"Hosp.-Prescriptions","type":"COUNT"
+       }
+      ],
+      "externalSelections":"external / global",
+      "groupBys":[
+       {
+        "attribute":{
+         "attribute":"PrescDate","dimension":"PrescDate","name":"PrescDate",
+         "object":"Hosp.-Prescriptions"
+        },
+        "groupByLevelNumber":1,"groupByName":"GROUP BY PrescDate",
+        "groupByStatesFormHierarchyWithRoot":"]-oo,oo[","includeUpperLevels":true
+       }
+      ],
+      "requestId":"openAttribute19244__S/S__Hosp.-Prescriptions__S/S__PrescDate__S/S__PrescDate",
+      "requestName":"openAttribute19244__S/S__Hosp.-Prescriptions__S/S__PrescDate__S/S__PrescDate",
+      "results":[
+       {
+        "data":[
+         {"# Hosp.-Prescriptions":{"value":16673},"PrescDate":"]-oo,oo["},
+         {"# Hosp.-Prescriptions":{"value":16428},"PrescDate":"2018"},
+         {"# Hosp.-Prescriptions":{"value":245},"PrescDate":"2019"}
+        ],
+        "fields":["PrescDate","# Hosp.-Prescriptions"],
+        "fieldValues":{
+         "PrescDate":["]-oo,oo[","< 2014","2014","2015","2016","2017","2018","2019","2020",">= 2021","null"]
+        }
+       }
+      ],
+      "userData":{
+       "winData":{
+        "colInfos":[
+         {"dataIndex":"stateName","hidden":false,"idx":0,"width":"60%"},
+         {"dataIndex":"data# Hosp.-Prescriptions","hidden":false,"idx":1,"width":null}
+        ],
+        "currentView":"table","height":300,"percentageBtnState":false,"showBar":true,
+        "sortOrder":false,"title":"PrescDate","usernotes":[],"width":400,"x":10,"xtype":"xgrid",
+        "y":305
+       }
+      }
+     },
+     {
+      "aggregations":[
+       {
+        "aggregationName":"# Hospitalizations","aggregationType":"COUNT",
+        "complementMissingBranches":false,"object":"Hospitalizations","type":"COUNT"
+       }
+      ],
+      "externalSelections":"external / global",
+      "groupBys":[
+       {
+        "attribute":{
+         "attribute":"DateFrom","dimension":"DateFrom","name":"DateFrom",
+         "object":"Hospitalizations"
+        },
+        "groupByLevelNumber":1,"groupByName":"GROUP BY DateFrom",
+        "groupByStatesFormHierarchyWithRoot":"]-oo,oo[","includeUpperLevels":true
+       }
+      ],
+      "requestId":"openAttribute87411__S/S__Hospitalizations__S/S__DateFrom__S/S__DateFrom",
+      "requestName":"openAttribute87411__S/S__Hospitalizations__S/S__DateFrom__S/S__DateFrom",
+      "results":[
+       {
+        "data":[
+         {"# Hospitalizations":{"value":7553},"DateFrom":"]-oo,oo["},
+         {"# Hospitalizations":{"value":7553},"DateFrom":"2018"}
+        ],
+        "fields":["DateFrom","# Hospitalizations"],
+        "fieldValues":{
+         "DateFrom":["]-oo,oo[","< 2014","2014","2015","2016","2017","2018","2019","2020",">= 2021","null"]
+        }
+       }
+      ],
+      "userData":{
+       "winData":{
+        "colInfos":[
+         {"dataIndex":"stateName","hidden":false,"idx":0,"width":"60%"},
+         {"dataIndex":"data# Hospitalizations","hidden":false,"idx":1,"width":null}
+        ],
+        "currentView":"table","height":300,"percentageBtnState":false,"showBar":true,
+        "sortOrder":false,"title":"DateFrom","usernotes":[],"width":400,"x":430,"xtype":"xgrid",
+        "y":25
+       }
+      }
+     },
+     {
+      "aggregations":[
+       {
+        "aggregationName":"# Patients","aggregationType":"COUNT","complementMissingBranches":false,
+        "object":"Patients","type":"COUNT"
+       }
+      ],
+      "externalSelections":"external / global",
+      "groupBys":[
+       {
+        "attribute":{"attribute":"Age","dimension":"Age","name":"Age","object":"Patients"},
+        "groupByLevelNumber":1,"groupByName":"GROUP BY Age",
+        "groupByStatesFormHierarchyWithRoot":"]-oo,oo[","includeUpperLevels":true
+       }
+      ],
+      "requestId":"openAttribute65479__S/S__Patients__S/S__Age__S/S__Age",
+      "requestName":"openAttribute65479__S/S__Patients__S/S__Age__S/S__Age",
+      "results":[
+       {
+        "data":[
+         {"# Patients":{"value":5670},"Age":"]-oo,oo["},
+         {"# Patients":{"value":5670},"Age":"20 - 39"}
+        ],
+        "fields":["Age","# Patients"],
+        "fieldValues":{
+         "Age":["]-oo,oo[","-oo - -1","0 - 19","20 - 39","40 - 59","60 - 79","80 - 99","100 - oo","null"]
+        }
+       }
+      ],
+      "userData":{
+       "winData":{
+        "colInfos":[
+         {"dataIndex":"stateName","hidden":false,"idx":0,"width":"60%"},
+         {"dataIndex":"data# Patients","hidden":false,"idx":1,"width":null}
+        ],
+        "currentView":"table","height":300,"percentageBtnState":false,"showBar":true,
+        "sortOrder":false,"title":"Age","usernotes":[],"width":400,"x":850,"xtype":"xgrid","y":25
+       }
+      }
+     },
+     {
+      "aggregations":[
+       {
+        "aggregationName":"# Hosp.-Prescriptions","aggregationType":"COUNT",
+        "complementMissingBranches":false,"object":"Hosp.-Prescriptions","type":"COUNT"
+       }
+      ],
+      "externalSelections":"external / global",
+      "groupBys":[
+       {
+        "attribute":{"attribute":"Costs","dimension":"Costs","name":"Costs","object":"Hosp.-Prescriptions"},
+        "groupByLevelNumber":1,"groupByName":"GROUP BY Costs",
+        "groupByStatesFormHierarchyWithRoot":"]-oo,oo[","includeUpperLevels":true
+       }
+      ],
+      "requestId":"openAttribute41746__S/S__Hosp.-Prescriptions__S/S__Costs__S/S__Costs",
+      "requestName":"openAttribute41746__S/S__Hosp.-Prescriptions__S/S__Costs__S/S__Costs",
+      "results":[
+       {
+        "data":[
+         {"# Hosp.-Prescriptions":{"value":16673},"Costs":"]-oo,oo["},
+         {"# Hosp.-Prescriptions":{"value":16673},"Costs":"]2.0,5.0]"}
+        ],
+        "fields":["Costs","# Hosp.-Prescriptions"],
+        "fieldValues":{
+         "Costs":[
+          "]-oo,oo[","]-oo,0.0]","]0.0,1.0]","]1.0,2.0]","]2.0,5.0]","]5.0,10.0]","]10.0,20.0]",
+          "]20.0,50.0]","]50.0,100.0]","]100.0,200.0]","]200.0,500.0]","]500.0,1000.0]",
+          "]1000.0,2000.0]","]2000.0,5000.0]","]5000.0,10000.0]","]10000.0,20000.0]",
+          "]20000.0,50000.0]","]50000.0,100000.0]","]100000.0,200000.0]","]200000.0,500000.0]",
+          "]500000.0,1000000.0]","]1000000.0,oo[","null"
+         ]
+        }
+       }
+      ],
+      "userData":{
+       "winData":{
+        "colInfos":[
+         {"dataIndex":"stateName","hidden":false,"idx":0,"width":"60%"},
+         {"dataIndex":"data# Hosp.-Prescriptions","hidden":false,"idx":1,"width":null}
+        ],
+        "currentView":"table","height":300,"percentageBtnState":false,"showBar":true,
+        "sortOrder":false,"title":"Costs","usernotes":[],"width":400,"x":10,"xtype":"xgrid","y":25
+       }
+      }
+     },
+     {
+      "aggregations":[
+       {
+        "aggregationName":"# Patients","aggregationType":"COUNT","complementMissingBranches":false,
+        "object":"Patients","type":"COUNT"
+       }
+      ],
+      "externalSelections":"external / global",
+      "groupBys":[
+       {
+        "attribute":{"attribute":"city","dimension":"City","name":"city","object":"Patients"},
+        "groupByLevelNumber":1,"groupByName":"GROUP BY city",
+        "groupByStatesFormHierarchyWithRoot":"city","includeUpperLevels":true
+       }
+      ],
+      "requestId":"openAttribute63087__S/S__Patients__S/S__City__S/S__city",
+      "requestName":"openAttribute63087__S/S__Patients__S/S__City__S/S__city",
+      "results":[
+       {
+        "data":[
+         {"# Patients":{"value":53},"city":"Baden-Wuerttemberg"},
+         {"# Patients":{"value":582},"city":"Bayern"},{"# Patients":{"value":3394},"city":"Berlin"},
+         {"# Patients":{"value":4},"city":"Brandenburg"},
+         {"# Patients":{"value":27},"city":"Bremen"},{"# Patients":{"value":455},"city":"Hamburg"},
+         {"# Patients":{"value":153},"city":"Hessen"},
+         {"# Patients":{"value":8},"city":"Mecklenburg-Vorpommern"},
+         {"# Patients":{"value":40},"city":"Niedersachsen"},
+         {"# Patients":{"value":802},"city":"Nordrhein-Westfalen"},
+         {"# Patients":{"value":14},"city":"Rheinland-Pfalz"},
+         {"# Patients":{"value":16},"city":"Saarland"},{"# Patients":{"value":33},"city":"Sachsen"},
+         {"# Patients":{"value":9},"city":"Sachsen-Anhalt"},
+         {"# Patients":{"value":8},"city":"Schleswig-Holstein"},
+         {"# Patients":{"value":5},"city":"Thueringen"},{"# Patients":{"value":5670},"city":"city"},
+         {"# Patients":{"value":30},"city":"no attribute mapping"},
+         {"# Patients":{"value":37},"city":"null"}
+        ],
+        "fields":["city","# Patients"],
+        "fieldValues":{
+         "city":[
+          "Baden-Wuerttemberg","Bayern","Berlin","Brandenburg","Bremen","Hamburg","Hessen",
+          "Mecklenburg-Vorpommern","Niedersachsen","Nordrhein-Westfalen","Rheinland-Pfalz",
+          "Saarland","Sachsen","Sachsen-Anhalt","Schleswig-Holstein","Thueringen","city",
+          "no attribute mapping","null"
+         ]
+        }
+       }
+      ],
+      "userData":{
+       "winData":{
+        "colInfos":[
+         {"dataIndex":"stateName","hidden":false,"idx":0,"width":"60%"},
+         {"dataIndex":"data# Patients","hidden":false,"idx":1,"width":null}
+        ],
+        "currentView":"table","height":300,"percentageBtnState":false,"showBar":true,
+        "sortOrder":false,"title":"city","usernotes":[],"width":400,"x":1270,"xtype":"xgrid","y":25
+       }
+      }
+     },
+     {
+      "aggregations":[
+       {
+        "aggregationName":"# Prescriptions","aggregationType":"COUNT",
+        "complementMissingBranches":false,"object":"Prescriptions","type":"COUNT"
+       }
+      ],
+      "externalSelections":"external / global",
+      "groupBys":[
+       {
+        "attribute":{
+         "attribute":"Costs (est.)","dimension":"Costs (est.)","name":"Costs (est.)",
+         "object":"Prescriptions"
+        },
+        "groupByLevelNumber":1,"groupByName":"GROUP BY Costs (est.)",
+        "groupByStatesFormHierarchyWithRoot":"]-oo,oo[","includeUpperLevels":true
+       }
+      ],
+      "requestId":"openAttribute78571__S/S__Prescriptions__S/S__Costs (est.)__S/S__Costs (est.)",
+      "requestName":"openAttribute78571__S/S__Prescriptions__S/S__Costs (est.)__S/S__Costs (est.)",
+      "results":[
+       {
+        "data":[
+         {"# Prescriptions":{"value":67638},"Costs (est.)":"]-oo,oo["},
+         {"# Prescriptions":{"value":30},"Costs (est.)":"]-oo,0.0]"},
+         {"# Prescriptions":{"value":3436},"Costs (est.)":"]0.0,1.0]"},
+         {"# Prescriptions":{"value":3420},"Costs (est.)":"]1.0,2.0]"},
+         {"# Prescriptions":{"value":9974},"Costs (est.)":"]2.0,5.0]"},
+         {"# Prescriptions":{"value":16860},"Costs (est.)":"]5.0,10.0]"},
+         {"# Prescriptions":{"value":33918},"Costs (est.)":"]10.0,20.0]"}
+        ],
+        "fields":["Costs (est.)","# Prescriptions"],
+        "fieldValues":{
+         "Costs (est.)":[
+          "]-oo,oo[","]-oo,0.0]","]0.0,1.0]","]1.0,2.0]","]2.0,5.0]","]5.0,10.0]","]10.0,20.0]",
+          "]20.0,50.0]","]50.0,100.0]","]100.0,200.0]","]200.0,500.0]","]500.0,1000.0]",
+          "]1000.0,2000.0]","]2000.0,5000.0]","]5000.0,10000.0]","]10000.0,20000.0]",
+          "]20000.0,50000.0]","]50000.0,100000.0]","]100000.0,200000.0]","]200000.0,500000.0]",
+          "]500000.0,1000000.0]","]1000000.0,oo[","null"
+         ]
+        }
+       }
+      ],
+      "userData":{
+       "winData":{
+        "colInfos":[
+         {"dataIndex":"stateName","hidden":false,"idx":0,"width":"60%"},
+         {"dataIndex":"data# Prescriptions","hidden":false,"idx":1,"width":null}
+        ],
+        "currentView":"table","height":300,"percentageBtnState":false,"showBar":true,
+        "sortOrder":false,"title":"Costs (est.)","usernotes":[],"width":400,"x":1690,
+        "xtype":"xgrid","y":25
+       }
+      }
+     }
+    ],
+    "resultsFormat":"dynamic",
+    "userData":{
+     "objectTree":{
+      "collapsed":false,
+      "expandedElements":[
+       "_&&_Patients","_&&_Patients_&&_Gender","_&&_Patients_&&_Age","_&&_Patients_&&_City",
+       "_&&_Patients_&&_Prescriptions","_&&_Patients_&&_Prescriptions_&&_Costs (est.)",
+       "_&&_Patients_&&_Hospitalizations","_&&_Patients_&&_Hospitalizations_&&_DateFrom",
+       "_&&_Patients_&&_Hospitalizations_&&_lengthStay",
+       "_&&_Patients_&&_Hospitalizations_&&_Hosp.-Prescriptions",
+       "_&&_Patients_&&_Hospitalizations_&&_Hosp.-Prescriptions_&&_PrescDate",
+       "_&&_Patients_&&_Hospitalizations_&&_Hosp.-Prescriptions_&&_Costs"
+      ],
+      "width":280
+     },
+     "sysinfo":{"height":1235,"width":2506}
+    }
+   }
+  }
+ ]
+}
