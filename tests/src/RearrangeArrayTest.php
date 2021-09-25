@@ -384,4 +384,108 @@ JSON
         );
     }
 
+    public function testStripFirst() {
+        $old = json_decode('{"my_array":[{"key":"qwerty"},{"key":"asdfg"},{"key":"zxcvb"}]}');
+        $new = json_decode('{"my_array":[{"key":"asdfg"},{"key":"zxcvb"}]}');
+
+        $diff = new JsonDiff($old, $new, JsonDiff::REARRANGE_ARRAYS );
+        $patch = $diff->getPatch();
+
+        $this->assertJsonStringEqualsJsonString('[{"op": "remove","path": "/my_array/0"}]', json_encode($patch));
+        $patch->apply($old);
+
+        $this->assertEquals($old, $new);
+    }
+
+    public function testStripLast() {
+        $old = json_decode('{"my_array":[{"key":"qwerty"},{"key":"asdfg"},{"key":"zxcvb"}]}');
+        $new = json_decode('{"my_array":[{"key":"qwerty"},{"key":"asdfg"}]}');
+
+        $diff = new JsonDiff($old, $new, JsonDiff::REARRANGE_ARRAYS );
+        $patch = $diff->getPatch();
+
+        $this->assertJsonStringEqualsJsonString('[{"op": "remove","path": "/my_array/2"}]', json_encode($patch));
+        $patch->apply($old);
+
+        $this->assertEquals($old, $new);
+    }
+
+    public function testStripMid() {
+        $old = json_decode('{"my_array":[{"key":"qwerty"},{"key":"asdfg"},{"key":"zxcvb"}]}');
+        $new = json_decode('{"my_array":[{"key":"qwerty"},{"key":"zxcvb"}]}');
+
+        $diff = new JsonDiff($old, $new, JsonDiff::REARRANGE_ARRAYS );
+        $patch = $diff->getPatch();
+
+        $this->assertJsonStringEqualsJsonString('[{"op": "remove","path": "/my_array/1"}]', json_encode($patch));
+        $patch->apply($old);
+
+        $this->assertEquals($old, $new);
+    }
+
+    public function testStrings() {
+        $old = json_decode('{"my_array":[
+           "]5,10]","]50,100]","]1000,2000]","]10000,oo[","]10,20]","]500,1000]","]20,50]","]2,5]",
+           "]1,2]","]2000,5000]","]5000,10000]","]100,200]","]0,1]","null","]200,500]"
+          ]}');
+
+        $new = json_decode('{"my_array":[
+           "]5,10]","]50,100]","]1000,2000]","]10000,oo[","]10,20]","]500,1000]","]20,50]","]2,5]",
+           "]1,2]","]2000,5000]","]5000,10000]","]100,200]","]0,1]","null","]200,500]"
+          ]}');
+
+        $diff = new JsonDiff($old, $new, JsonDiff::REARRANGE_ARRAYS );
+        $patch = $diff->getPatch();
+
+        $this->assertJsonStringEqualsJsonString('[]', json_encode($patch));
+        $patch->apply($old);
+
+        $this->assertEquals($old, $new);
+    }
+
+    public function testStrings2() {
+        $old = json_decode('{"my_array":[
+       "null","]5,10]","]20,50]","]2000,5000]","]500,1000]","]10,20]","]0,1]","]1000,2000]",
+       "]10000,oo[","]1,2]","]100,200]","]50,100]","]5000,10000]","]2,5]","]200,500]"
+      ]}');
+
+        $new = json_decode('{"my_array":[
+       "]5,10]","]50,100]","]1000,2000]","]10000,oo[","]10,20]","]500,1000]","]20,50]","]2,5]",
+       "]1,2]","]2000,5000]","]5000,10000]","]100,200]","]0,1]","null","]200,500]"
+      ]}');
+
+        $diff = new JsonDiff($old, $new, JsonDiff::REARRANGE_ARRAYS );
+        $patch = $diff->getPatch();
+
+        $this->assertJsonStringEqualsJsonString('[]', json_encode($patch));
+    }
+
+
+    public function testComplex() {
+        $old = json_decode(file_get_contents(__DIR__ . '/../assets/issue38_1.json'));
+        $new = json_decode(file_get_contents(__DIR__ . '/../assets/issue38_2.json'));
+
+        $diff = new JsonDiff($old, $new, JsonDiff::REARRANGE_ARRAYS );
+        $patch = $diff->getPatch();
+
+        $this->assertJsonStringEqualsJsonString('[]', json_encode($patch));
+    }
+
+    public function testNestedObjects() {
+        $old = json_decode('{"my_array":[
+           {"a":{"a1":1,"b1":1}}, 
+           {"a":{"a2":2,"b2":2}}
+          ]}');
+
+        $new = json_decode('{"my_array":[
+           {"a":{"a2":2,"b2":2}},
+           {"a":{"a1":1,"b1":1}} 
+          ]}');
+
+        $diff = new JsonDiff($old, $new, JsonDiff::REARRANGE_ARRAYS );
+        $patch = $diff->getPatch();
+
+        $this->assertJsonStringEqualsJsonString('[]', json_encode($patch));
+    }
+
 }

@@ -64,7 +64,7 @@ class JsonHash
         foreach ($dataKeys as $key => $value) {
             $propertyPath = $path . '/' .
                 JsonPointer::escapeSegment($key, (bool)($this->options & JsonDiff::JSON_URI_FRAGMENT_ID));
-            $propertyHash = $propertyPath . $this->xorHash($value, $propertyPath);
+            $propertyHash = $propertyPath . md5($key, true) . $this->xorHash($value, $propertyPath);
             if (strlen($xorHash) < strlen($propertyHash)) {
                 $xorHash = str_pad($xorHash, strlen($propertyHash));
             }
