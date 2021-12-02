@@ -14,9 +14,9 @@ A PHP implementation for finding unordered diff between two `JSON` documents.
  * To simplify changes review between two `JSON` files you can use a standard `diff` tool on rearranged pretty-printed `JSON`.
  * To detect breaking changes by analyzing removals and changes from original `JSON`.
  * To keep original order of object sets (for example `swagger.json` [parameters](https://swagger.io/docs/specification/describing-parameters/) list).
- * To [make](#getpatch) and [apply](#jsonpatch) JSON Patches, specified in [RFC 6902](http://tools.ietf.org/html/rfc6902) from the IETF.
- * To [make](#getmergepatch) and [apply](#jsonmergepatch) JSON Merge Patches, specified in [RFC 7386](https://tools.ietf.org/html/rfc7386) from the IETF.
- * To retrieve and modify data by [JSON Pointer](http://tools.ietf.org/html/rfc6901).
+ * To [make](#getpatch) and [apply](#jsonpatch) JSON Patches, specified in [RFC 6902](https://datatracker.ietf.org/doc/html/rfc6902) from the IETF.
+ * To [make](#getmergepatch) and [apply](#jsonmergepatch) JSON Merge Patches, specified in [RFC 7386](https://datatracker.ietf.org/doc/html/rfc7386) from the IETF.
+ * To retrieve and modify data by [JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901).
  * To recursively replace by JSON value.
 
 ## Installation
@@ -76,7 +76,7 @@ Returns total number of differences
 Returns [`JsonPatch`](#jsonpatch) of difference
 
 #### `getMergePatch`
-Returns [JSON Merge Patch](https://tools.ietf.org/html/rfc7386) value of difference
+Returns [JSON Merge Patch](https://datatracker.ietf.org/doc/html/rfc7386) value of difference
 
 #### `getRearranged`
 Returns new value, rearranged with original order.
