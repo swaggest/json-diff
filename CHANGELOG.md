@@ -74,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Compatibility option to `TOLERATE_ASSOCIATIVE_ARRAYS` that mimic JSON objects.
 
-[3.8.4]: https://github.com/swaggest/json-diff/compare/v3.8.3...v3.8.4
+[3.9.0]: https://github.com/swaggest/json-diff/compare/v3.8.3...v3.9.0
 [3.8.3]: https://github.com/swaggest/json-diff/compare/v3.8.2...v3.8.3
 [3.8.2]: https://github.com/swaggest/json-diff/compare/v3.8.1...v3.8.2
 [3.8.1]: https://github.com/swaggest/json-diff/compare/v3.8.0...v3.8.1
