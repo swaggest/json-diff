@@ -5,6 +5,7 @@ namespace Swaggest\JsonDiff\Tests;
 use Swaggest\JsonDiff\Exception;
 use Swaggest\JsonDiff\JsonDiff;
 use Swaggest\JsonDiff\JsonPatch;
+use Swaggest\JsonDiff\PatchTestOperationFailedException;
 
 class JsonPatchTest extends \PHPUnit_Framework_TestCase
 {
@@ -140,6 +141,15 @@ JSON;
         $p->op(new JsonPatch\Add('/some', 22));
         $p->apply($data);
         $this->assertEquals((object)array('some' => 22), $data);
+    }
+
+    public function testTestOperationFailed()
+    {
+        $data = array('abc' => 'xyz');
+        $p = new JsonPatch();
+        $p->op(new JsonPatch\Test('/abc', 'def'));
+        $errors = $p->apply($data, false);
+        $this->assertInstanceOf(PatchTestOperationFailedException::class, $errors[0]);
     }
 
 }
