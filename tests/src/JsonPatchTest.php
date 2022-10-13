@@ -5,6 +5,7 @@ namespace Swaggest\JsonDiff\Tests;
 use Swaggest\JsonDiff\Exception;
 use Swaggest\JsonDiff\JsonDiff;
 use Swaggest\JsonDiff\JsonPatch;
+use Swaggest\JsonDiff\MissingFieldException;
 use Swaggest\JsonDiff\PatchTestOperationFailedException;
 
 class JsonPatchTest extends \PHPUnit_Framework_TestCase
@@ -75,7 +76,7 @@ JSON;
 
     public function testMissingOp()
     {
-        $this->setExpectedException(get_class(new Exception()), 'Missing "op" in operation data');
+        $this->setExpectedException(MissingFieldException::class, 'Missing "op" in operation data');
         JsonPatch::import(array((object)array('path' => '/123')));
     }
 
@@ -87,7 +88,7 @@ JSON;
 
     public function testInvalidOp()
     {
-        $this->setExpectedException(get_class(new Exception()), 'Unknown "op": wat');
+        $this->setExpectedException(get_class(new Exception()), 'Invalid "op": wat');
         JsonPatch::import(array((object)array('op' => 'wat', 'path' => '/123')));
     }
 
