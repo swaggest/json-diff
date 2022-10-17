@@ -15,7 +15,7 @@ docker-test-new:
 	@docker run -v $$PWD:/app -w /app --rm php:8.1.0RC1-zts-buster php vendor/bin/phpunit --configuration phpunit.xml
 
 docker-test-old:
-	@docker run -v $$PWD:/app -w /app --rm php:5.4-cli php vendor/bin/phpunit --configuration phpunit.xml
+	@docker run -v $$PWD:/app -w /app --rm php:5.6-cli php vendor/bin/phpunit --configuration phpunit.xml
 
 test:
 	@php vendor/bin/phpunit --configuration phpunit.xml
