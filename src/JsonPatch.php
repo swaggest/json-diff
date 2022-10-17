@@ -174,8 +174,7 @@ class JsonPatch implements \JsonSerializable
                         $diff = new JsonDiff($operation->value, $value,
                             JsonDiff::STOP_ON_DIFF);
                         if ($diff->getDiffCnt() !== 0) {
-                            throw new PatchTestOperationFailedException('Test operation ' . json_encode($operation, JSON_UNESCAPED_SLASHES)
-                                . ' failed: ' . json_encode($value));
+                            throw new PatchTestOperationFailedException($operation, $value);
                         }
                         break;
                 }

@@ -162,11 +162,16 @@ JSON;
 
     public function testTestOperationFailed()
     {
-        $data = array('abc' => 'xyz');
+        $actualValue = 'xyz';
+        $data = array('abc' => $actualValue);
+        $operation = new JsonPatch\Test('/abc', 'def');
+
         $p = new JsonPatch();
-        $p->op(new JsonPatch\Test('/abc', 'def'));
-        $errors = $p->apply($data, false);
-        $this->assertInstanceOf(PatchTestOperationFailedException::class, $errors[0]);
+        $p->op($operation);
+        $testError = $p->apply($data, false)[0];
+        $this->assertInstanceOf(PatchTestOperationFailedException::class, $testError);
+        $this->assertSame($operation, $testError->getOperation());
+        $this->assertSame($actualValue, $testError->getActualValue());
     }
 
 }
