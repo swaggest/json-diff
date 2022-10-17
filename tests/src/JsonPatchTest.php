@@ -77,8 +77,16 @@ JSON;
 
     public function testMissingOp()
     {
-        $this->setExpectedException(MissingFieldException::class, 'Missing "op" in operation data');
-        JsonPatch::import(array((object)array('path' => '/123')));
+		$operation = (object)array('path' => '/123');
+		try {
+			JsonPatch::import(array($operation));
+			$this->fail('Expected exception was not thrown');
+		} catch (Exception $exception) {
+			$this->assertInstanceOf(MissingFieldException::class, $exception);
+			$this->assertSame('Missing "op" in operation data', $exception->getMessage());
+			$this->assertSame('op', $exception->getMissingField());
+			$this->assertSame($operation, $exception->getOperation());
+		}
     }
 
     public function testMissingPath()
@@ -89,8 +97,15 @@ JSON;
 
     public function testInvalidOp()
     {
-        $this->setExpectedException(UnknownOperationException::class, 'Unknown "op": wat');
-        JsonPatch::import(array((object)array('op' => 'wat', 'path' => '/123')));
+		$operation = (object)array('op' => 'wat', 'path' => '/123');
+		try {
+			JsonPatch::import(array($operation));
+			$this->fail('Expected exception was not thrown');
+		} catch (Exception $exception) {
+			$this->assertInstanceOf(UnknownOperationException::class, $exception);
+			$this->assertSame('Unknown "op": wat', $exception->getMessage());
+			$this->assertSame($operation, $exception->getOperation());
+		}
     }
 
     public function testMissingFrom()
