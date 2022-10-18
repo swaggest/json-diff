@@ -5,6 +5,7 @@ namespace Swaggest\JsonDiff\Tests;
 
 use Swaggest\JsonDiff\Exception;
 use Swaggest\JsonDiff\JsonPointer;
+use Swaggest\JsonDiff\JsonPointerException;
 
 class JsonPointerTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +31,7 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
 
         try {
             $this->assertSame('null', json_encode(JsonPointer::get($json, JsonPointer::splitPath('/l1/l2/non-existent'))));
-        } catch (Exception $exception) {
+        } catch (JsonPointerException $exception) {
             $this->assertSame('Key not found: non-existent', $exception->getMessage());
         }
 
@@ -89,7 +90,7 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
         try {
             JsonPointer::get($s, ['one', 'two']);
             $this->fail('Exception expected');
-        } catch (Exception $e) {
+        } catch (JsonPointerException $e) {
             $this->assertEquals('Key not found: two', $e->getMessage());
         }
         $this->assertEquals(null, $s->one->two);

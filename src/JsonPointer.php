@@ -66,7 +66,7 @@ class JsonPointer
             return self::splitPathURIFragment($pathItems);
         } else {
             if ($first !== '') {
-                throw new Exception('Path must start with "/": ' . $path);
+                throw new JsonPointerException('Path must start with "/": ' . $path);
             }
             return self::splitPathJsonString($pathItems);
         }
@@ -105,7 +105,7 @@ class JsonPointer
         while (null !== $key = array_shift($pathItems)) {
             if ($ref instanceof \stdClass || is_object($ref)) {
                 if (PHP_VERSION_ID < 70100 && '' === $key) {
-                    throw new Exception('Empty property name is not supported by PHP <7.1',
+                    throw new JsonPointerException('Empty property name is not supported by PHP <7.1',
                         Exception::EMPTY_PROPERTY_NAME_UNSUPPORTED);
                 }
 
@@ -113,7 +113,7 @@ class JsonPointer
                     $ref = &$ref->$key;
                 } else {
                     if (!isset($ref->$key) && count($pathItems)) {
-                        throw new Exception('Non-existent path item: ' . $key);
+                        throw new JsonPointerException('Non-existent path item: ' . $key);
                     } else {
                         $ref = &$ref->$key;
                     }
@@ -126,7 +126,7 @@ class JsonPointer
                         $ref = new \stdClass();
                         $ref = &$ref->{$key};
                     } else {
-                        throw new Exception('Non-existent path item: ' . $key);
+                        throw new JsonPointerException('Non-existent path item: ' . $key);
                     }
                 } elseif ([] === $ref && 0 === ($flags & self::STRICT_MODE) && false === $intKey && '-' !== $key) {
                     $ref = new \stdClass();
@@ -138,7 +138,7 @@ class JsonPointer
                     } else {
                         if (false === $intKey) {
                             if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
-                                throw new Exception('Invalid key for array operation');
+                                throw new JsonPointerException('Invalid key for array operation');
                             }
                             $ref = &$ref[$key];
                             continue;
@@ -148,9 +148,9 @@ class JsonPointer
                         }
                         if (0 === ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS)) {
                             if ($intKey > count($ref) && 0 === ($flags & self::RECURSIVE_KEY_CREATION)) {
-                                throw new Exception('Index is greater than number of items in array');
+                                throw new JsonPointerException('Index is greater than number of items in array');
                             } elseif ($intKey < 0) {
-                                throw new Exception('Negative index');
+                                throw new JsonPointerException('Negative index');
                             }
                         }
 
@@ -203,7 +203,7 @@ class JsonPointer
         while (null !== $key = array_shift($pathItems)) {
             if ($ref instanceof \stdClass) {
                 if (PHP_VERSION_ID < 70100 && '' === $key) {
-                    throw new Exception('Empty property name is not supported by PHP <7.1',
+                    throw new JsonPointerException('Empty property name is not supported by PHP <7.1',
                         Exception::EMPTY_PROPERTY_NAME_UNSUPPORTED);
                 }
 
@@ -211,22 +211,22 @@ class JsonPointer
                 if (self::arrayKeyExists($key, $vars)) {
                     $ref = self::arrayGet($key, $vars);
                 } else {
-                    throw new Exception('Key not found: ' . $key);
+                    throw new JsonPointerException('Key not found: ' . $key);
                 }
             } elseif (is_array($ref)) {
                 if (self::arrayKeyExists($key, $ref)) {
                     $ref = $ref[$key];
                 } else {
-                    throw new Exception('Key not found: ' . $key);
+                    throw new JsonPointerException('Key not found: ' . $key);
                 }
             } elseif (is_object($ref)) {
                 if (isset($ref->$key)) {
                     $ref = $ref->$key;
                 } else {
-                    throw new Exception('Key not found: ' . $key);
+                    throw new JsonPointerException('Key not found: ' . $key);
                 }
             } else {
-                throw new Exception('Key not found: ' . $key);
+                throw new JsonPointerException('Key not found: ' . $key);
             }
         }
         return $ref;
@@ -260,19 +260,19 @@ class JsonPointer
                 if (property_exists($ref, $key)) {
                     $ref = &$ref->$key;
                 } else {
-                    throw new Exception('Key not found: ' . $key);
+                    throw new JsonPointerException('Key not found: ' . $key);
                 }
             } elseif (is_object($ref)) {
                 if (isset($ref->$key)) {
                     $ref = &$ref->$key;
                 } else {
-                    throw new Exception('Key not found: ' . $key);
+                    throw new JsonPointerException('Key not found: ' . $key);
                 }
             } else {
                 if (array_key_exists($key, $ref)) {
                     $ref = &$ref[$key];
                 } else {
-                    throw new Exception('Key not found: ' . $key);
+                    throw new JsonPointerException('Key not found: ' . $key);
                 }
             }
         }
