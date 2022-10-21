@@ -5,7 +5,11 @@ namespace Swaggest\JsonDiff\Tests;
 use Swaggest\JsonDiff\Exception;
 use Swaggest\JsonDiff\JsonDiff;
 use Swaggest\JsonDiff\JsonPatch;
+use Swaggest\JsonDiff\JsonPatch\OpPath;
+use Swaggest\JsonDiff\MissingFieldException;
 use Swaggest\JsonDiff\PatchTestOperationFailedException;
+use Swaggest\JsonDiff\PathException;
+use Swaggest\JsonDiff\UnknownOperationException;
 
 class JsonPatchTest extends \PHPUnit_Framework_TestCase
 {
@@ -75,8 +79,16 @@ JSON;
 
     public function testMissingOp()
     {
-        $this->setExpectedException(get_class(new Exception()), 'Missing "op" in operation data');
-        JsonPatch::import(array((object)array('path' => '/123')));
+		$operation = (object)array('path' => '/123');
+		try {
+			JsonPatch::import(array($operation));
+			$this->fail('Expected exception was not thrown');
+		} catch (Exception $exception) {
+			$this->assertInstanceOf(MissingFieldException::class, $exception);
+			$this->assertSame('Missing "op" in operation data', $exception->getMessage());
+			$this->assertSame('op', $exception->getMissingField());
+			$this->assertSame($operation, $exception->getOperation());
+		}
     }
 
     public function testMissingPath()
@@ -87,8 +99,15 @@ JSON;
 
     public function testInvalidOp()
     {
-        $this->setExpectedException(get_class(new Exception()), 'Unknown "op": wat');
-        JsonPatch::import(array((object)array('op' => 'wat', 'path' => '/123')));
+		$operation = (object)array('op' => 'wat', 'path' => '/123');
+		try {
+			JsonPatch::import(array($operation));
+			$this->fail('Expected exception was not thrown');
+		} catch (Exception $exception) {
+			$this->assertInstanceOf(UnknownOperationException::class, $exception);
+			$this->assertSame('Unknown "op": wat', $exception->getMessage());
+			$this->assertSame($operation, $exception->getOperation());
+		}
     }
 
     public function testMissingFrom()
@@ -145,11 +164,100 @@ JSON;
 
     public function testTestOperationFailed()
     {
-        $data = array('abc' => 'xyz');
+        $actualValue = 'xyz';
+        $data = array('abc' => $actualValue);
+        $operation = new JsonPatch\Test('/abc', 'def');
+
         $p = new JsonPatch();
-        $p->op(new JsonPatch\Test('/abc', 'def'));
-        $errors = $p->apply($data, false);
-        $this->assertInstanceOf(PatchTestOperationFailedException::class, $errors[0]);
+        $p->op($operation);
+        $testError = $p->apply($data, false)[0];
+        $this->assertInstanceOf(PatchTestOperationFailedException::class, $testError);
+        $this->assertSame($operation, $testError->getOperation());
+        $this->assertSame($actualValue, $testError->getActualValue());
     }
 
+    public function testPathExceptionContinueOnError()
+    {
+        $actualValue = 'xyz';
+        $data = array('abc' => $actualValue);
+        $patch = new JsonPatch();
+
+        $operation1 = new JsonPatch\Test('/abc', 'def');
+        $patch->op($operation1);
+
+        $operation2 = new JsonPatch\Move('/target', '/source');
+        $patch->op($operation2);
+
+        $errors = $patch->apply($data, false);
+
+        $this->assertInstanceOf(PatchTestOperationFailedException::class, $errors[0]);
+        $this->assertSame($operation1, $errors[0]->getOperation());
+
+        $this->assertInstanceOf(PathException::class, $errors[1]);
+        $this->assertSame($operation2, $errors[1]->getOperation());
+        $this->assertSame('from', $errors[1]->getField());
+    }
+
+    public function pathExceptionProvider() {
+        return [
+            'splitPath_path' => [
+                new JsonPatch\Copy('invalid/path', '/valid/from'),
+                'Path must start with "/": invalid/path',
+                'path'
+            ],
+            'splitPath_from' => [
+                new JsonPatch\Copy('/valid/path', 'invalid/from'),
+                'Path must start with "/": invalid/from',
+                'from'
+            ],
+            'add' => [
+                new JsonPatch\Add('/some/path', 22),
+                'Non-existent path item: some',
+                'path'
+            ],
+            'get_from' => [
+                new JsonPatch\Copy('/target', '/source'),
+                'Key not found: source',
+                'from'
+            ],
+            'get_path' => [
+                new JsonPatch\Replace('/some/path', 23),
+                'Key not found: some',
+                'path'
+            ],
+            'remove_from' => [
+                new JsonPatch\Move('/target', '/source'),
+                'Key not found: source',
+                'from'
+            ],
+            'remove_path' => [
+                new JsonPatch\Remove('/some/path'),
+                'Key not found: some',
+                'path'
+            ]
+        ];
+    }
+
+    /**
+     * @param OpPath $operation
+     * @param string $expectedMessage
+     * @param string $expectedField
+     *
+     * @dataProvider pathExceptionProvider
+     */
+    public function testPathException(OpPath $operation, $expectedMessage, $expectedField) {
+        $data = new \stdClass();
+        $patch = new JsonPatch();
+
+        $patch->op($operation);
+
+        try {
+            $patch->apply($data );
+            $this->fail('PathException expected');
+        } catch (Exception $ex) {
+            $this->assertInstanceOf(PathException::class, $ex);
+            $this->assertEquals($expectedMessage, $ex->getMessage());
+            $this->assertEquals($expectedField, $ex->getField());
+        }
+    }
 }

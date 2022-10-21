@@ -5,30 +5,32 @@ namespace Swaggest\JsonDiff;
 
 use Throwable;
 
-class PatchTestOperationFailedException extends Exception
+class PathException extends Exception
 {
     /** @var object */
     private $operation;
+
     /** @var string */
-    private $actualValue;
+    private $field;
 
     /**
+     * @param string $message
      * @param object $operation
-     * @param string $actualValue
+     * @param string $field
      * @param int $code
      * @param Throwable|null $previous
      */
     public function __construct(
+        $message,
         $operation,
-        $actualValue,
+        $field,
         $code = 0,
         Throwable $previous = null
     )
     {
-        parent::__construct('Test operation ' . json_encode($operation, JSON_UNESCAPED_SLASHES)
-            . ' failed: ' . json_encode($actualValue), $code, $previous);
+        parent::__construct($message, $code, $previous);
         $this->operation = $operation;
-        $this->actualValue = $actualValue;
+        $this->field = $field;
     }
 
     /**
@@ -42,8 +44,8 @@ class PatchTestOperationFailedException extends Exception
     /**
      * @return string
      */
-    public function getActualValue()
+    public function getField()
     {
-        return $this->actualValue;
+        return $this->field;
     }
 }

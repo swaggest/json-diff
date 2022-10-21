@@ -60,11 +60,15 @@ class JsonPatch implements \JsonSerializable
                 $operation = (object)$operation;
             }
 
+            if (!is_object($operation)) {
+                throw new Exception('Invalid patch operation - should be a JSON object');
+            }
+
             if (!isset($operation->op)) {
-                throw new Exception('Missing "op" in operation data');
+                throw new MissingFieldException('op', $operation);
             }
             if (!isset($operation->path)) {
-                throw new Exception('Missing "path" in operation data');
+                throw new MissingFieldException('path', $operation);
             }
 
             $op = null;
@@ -88,18 +92,18 @@ class JsonPatch implements \JsonSerializable
                     $op = new Test();
                     break;
                 default:
-                    throw new Exception('Unknown "op": ' . $operation->op);
+                    throw new UnknownOperationException($operation);
             }
             $op->path = $operation->path;
             if ($op instanceof OpPathValue) {
                 if (property_exists($operation, 'value')) {
                     $op->value = $operation->value;
                 } else {
-                    throw new Exception('Missing "value" in operation data');
+                    throw new MissingFieldException('value', $operation);
                 }
             } elseif ($op instanceof OpPathFrom) {
                 if (!isset($operation->from)) {
-                    throw new Exception('Missing "from" in operation data');
+                    throw new MissingFieldException('from', $operation);
                 }
                 $op->from = $operation->from;
             }
@@ -141,20 +145,26 @@ class JsonPatch implements \JsonSerializable
         $errors = array();
         foreach ($this->operations as $operation) {
             try {
+                // track the current pointer field so we can use it for a potential PathException
+                $pointerField = 'path';
                 $pathItems = JsonPointer::splitPath($operation->path);
                 switch (true) {
                     case $operation instanceof Add:
                         JsonPointer::add($original, $pathItems, $operation->value, $this->flags);
                         break;
                     case $operation instanceof Copy:
+                        $pointerField = 'from';
                         $fromItems = JsonPointer::splitPath($operation->from);
                         $value = JsonPointer::get($original, $fromItems);
+                        $pointerField = 'path';
                         JsonPointer::add($original, $pathItems, $value, $this->flags);
                         break;
                     case $operation instanceof Move:
+                        $pointerField = 'from';
                         $fromItems = JsonPointer::splitPath($operation->from);
                         $value = JsonPointer::get($original, $fromItems);
                         JsonPointer::remove($original, $fromItems, $this->flags);
+                        $pointerField = 'path';
                         JsonPointer::add($original, $pathItems, $value, $this->flags);
                         break;
                     case $operation instanceof Remove:
@@ -170,10 +180,21 @@ class JsonPatch implements \JsonSerializable
                         $diff = new JsonDiff($operation->value, $value,
                             JsonDiff::STOP_ON_DIFF);
                         if ($diff->getDiffCnt() !== 0) {
-                            throw new PatchTestOperationFailedException('Test operation ' . json_encode($operation, JSON_UNESCAPED_SLASHES)
-                                . ' failed: ' . json_encode($value));
+                            throw new PatchTestOperationFailedException($operation, $value);
                         }
                         break;
+                }
+            } catch (JsonPointerException $jsonPointerException) {
+                $pathException = new PathException(
+                    $jsonPointerException->getMessage(),
+                    $operation,
+                    $pointerField,
+                    $jsonPointerException->getCode()
+                );
+                if ($stopOnError) {
+                    throw $pathException;
+                } else {
+                    $errors[] = $pathException;
                 }
             } catch (Exception $exception) {
                 if ($stopOnError) {
