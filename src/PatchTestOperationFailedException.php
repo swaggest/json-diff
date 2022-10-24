@@ -3,18 +3,19 @@
 namespace Swaggest\JsonDiff;
 
 
+use Swaggest\JsonDiff\JsonPatch\Test;
 use Throwable;
 
 class PatchTestOperationFailedException extends Exception
 {
-    /** @var object */
+    /** @var Test */
     private $operation;
-    /** @var string */
+    /** @var mixed */
     private $actualValue;
 
     /**
-     * @param object $operation
-     * @param string $actualValue
+     * @param Test $operation
+     * @param mixed $actualValue
      * @param int $code
      * @param Throwable|null $previous
      */
@@ -32,7 +33,7 @@ class PatchTestOperationFailedException extends Exception
     }
 
     /**
-     * @return object
+     * @return Test
      */
     public function getOperation()
     {
@@ -40,7 +41,7 @@ class PatchTestOperationFailedException extends Exception
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getActualValue()
     {

@@ -3,15 +3,16 @@
 namespace Swaggest\JsonDiff;
 
 
+use Swaggest\JsonDiff\JsonPatch\OpPath;
 use Throwable;
 
 class UnknownOperationException extends Exception
 {
-    /** @var object */
+    /** @var OpPath|object */
     private $operation;
 
     /**
-     * @param object $operation
+     * @param OpPath|object $operation
      * @param int $code
      * @param Throwable|null $previous
      */
@@ -27,7 +28,7 @@ class UnknownOperationException extends Exception
     }
 
     /**
-     * @return object
+     * @return OpPath|object
      */
     public function getOperation()
     {

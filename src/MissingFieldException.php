@@ -2,18 +2,19 @@
 
 namespace Swaggest\JsonDiff;
 
+use Swaggest\JsonDiff\JsonPatch\OpPath;
 use Throwable;
 
 class MissingFieldException extends Exception
 {
     /** @var string */
     private $missingField;
-    /** @var object */
+    /** @var OpPath|object */
     private $operation;
 
     /**
      * @param string $missingField
-     * @param object $operation
+     * @param OpPath|object $operation
      * @param int $code
      * @param Throwable|null $previous
      */
@@ -38,7 +39,7 @@ class MissingFieldException extends Exception
     }
 
     /**
-     * @return object
+     * @return OpPath|object
      */
     public function getOperation()
     {

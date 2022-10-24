@@ -3,11 +3,12 @@
 namespace Swaggest\JsonDiff;
 
 
+use Swaggest\JsonDiff\JsonPatch\OpPath;
 use Throwable;
 
 class PathException extends Exception
 {
-    /** @var object */
+    /** @var OpPath */
     private $operation;
 
     /** @var string */
@@ -15,7 +16,7 @@ class PathException extends Exception
 
     /**
      * @param string $message
-     * @param object $operation
+     * @param OpPath $operation
      * @param string $field
      * @param int $code
      * @param Throwable|null $previous
@@ -34,7 +35,7 @@ class PathException extends Exception
     }
 
     /**
-     * @return object
+     * @return OpPath
      */
     public function getOperation()
     {
