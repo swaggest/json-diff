@@ -110,6 +110,45 @@ JSON;
 		}
     }
 
+    /**
+     * @dataProvider provideInvalidFieldType
+     *
+     * @param object $operation
+     * @param string $expectedException
+     * @param string $expectedMessage
+     */
+    public function testInvalidFieldType($operation, $expectedException, $expectedMessage)
+    {
+        try {
+            JsonPatch::import(array($operation));
+            $this->fail('Expected exception was not thrown');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf($expectedException, $exception);
+            $this->assertSame($expectedMessage, $exception->getMessage());
+        }
+    }
+
+    public function provideInvalidFieldType()
+    {
+        return [
+            '"op" invalid type' => [
+                (object)array('op' => array('foo' => 'bar'), 'path' => '/123', 'value' => 'test'),
+                Exception::class,
+                'Invalid field type - "op" should be of type: string'
+            ],
+            '"path" invalid type' => [
+                (object)array('op' => 'add', 'path' => array('foo' => 'bar'), 'value' => 'test'),
+                Exception::class,
+                'Invalid field type - "path" should be of type: string'
+            ],
+            '"from" invalid type' => [
+                (object)array('op' => 'move', 'path' => '/123', 'from' => array('foo' => 'bar')),
+                Exception::class,
+                'Invalid field type - "from" should be of type: string'
+            ]
+        ];
+    }
+
     public function testMissingFrom()
     {
         $this->setExpectedException(get_class(new Exception()), 'Missing "from" in operation data');
