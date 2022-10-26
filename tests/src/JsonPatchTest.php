@@ -3,6 +3,7 @@
 namespace Swaggest\JsonDiff\Tests;
 
 use Swaggest\JsonDiff\Exception;
+use Swaggest\JsonDiff\InvalidFieldTypeException;
 use Swaggest\JsonDiff\JsonDiff;
 use Swaggest\JsonDiff\JsonPatch;
 use Swaggest\JsonDiff\JsonPatch\OpPath;
@@ -114,17 +115,21 @@ JSON;
      * @dataProvider provideInvalidFieldType
      *
      * @param object $operation
-     * @param string $expectedException
      * @param string $expectedMessage
+     * @param string $expectedField
+     * @param string $expectedType
      */
-    public function testInvalidFieldType($operation, $expectedException, $expectedMessage)
+    public function testInvalidFieldType($operation, $expectedMessage, $expectedField, $expectedType)
     {
         try {
             JsonPatch::import(array($operation));
             $this->fail('Expected exception was not thrown');
         } catch (Exception $exception) {
-            $this->assertInstanceOf($expectedException, $exception);
+            $this->assertInstanceOf(InvalidFieldTypeException::class, $exception);
             $this->assertSame($expectedMessage, $exception->getMessage());
+            $this->assertSame($expectedField, $exception->getField());
+            $this->assertSame($expectedType, $exception->getExpectedType());
+            $this->assertSame($operation, $exception->getOperation());
         }
     }
 
@@ -133,18 +138,21 @@ JSON;
         return [
             '"op" invalid type' => [
                 (object)array('op' => array('foo' => 'bar'), 'path' => '/123', 'value' => 'test'),
-                Exception::class,
-                'Invalid field type - "op" should be of type: string'
+                'Invalid field type - "op" should be of type: string',
+                'op',
+                'string'
             ],
             '"path" invalid type' => [
                 (object)array('op' => 'add', 'path' => array('foo' => 'bar'), 'value' => 'test'),
-                Exception::class,
-                'Invalid field type - "path" should be of type: string'
+                'Invalid field type - "path" should be of type: string',
+                'path',
+                'string'
             ],
             '"from" invalid type' => [
                 (object)array('op' => 'move', 'path' => '/123', 'from' => array('foo' => 'bar')),
-                Exception::class,
-                'Invalid field type - "from" should be of type: string'
+                'Invalid field type - "from" should be of type: string',
+                'from',
+                'string'
             ]
         ];
     }
