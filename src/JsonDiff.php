@@ -49,6 +49,11 @@ class JsonDiff
     private $options = 0;
 
     /**
+     * @var array Skip included paths
+     */
+    private $skipPaths = [];
+
+    /**
      * @var mixed Merge patch container
      */
     private $merge;
@@ -85,15 +90,18 @@ class JsonDiff
      * @param mixed $original
      * @param mixed $new
      * @param int $options
+     * @param array $skipPaths
      * @throws Exception
      */
-    public function __construct($original, $new, $options = 0)
+    public function __construct($original, $new, $options = 0, $skipPaths = [])
     {
         if (!($options & self::SKIP_JSON_PATCH)) {
             $this->jsonPatch = new JsonPatch();
         }
 
         $this->options = $options;
+
+        $this->skipPaths = $skipPaths;
 
         if ($options & self::JSON_URI_FRAGMENT_ID) {
             $this->path = '#';
@@ -265,7 +273,7 @@ class JsonDiff
             (!$original instanceof \stdClass && !is_array($original))
             || (!$new instanceof \stdClass && !is_array($new))
         ) {
-            if ($original !== $new) {
+            if ($original !== $new && !in_array($this->path, $this->skipPaths)) {
                 $this->modifiedCnt++;
                 if ($this->options & self::STOP_ON_DIFF) {
                     return null;
