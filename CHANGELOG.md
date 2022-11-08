@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.10.2] - 2022-11-08
+
+### Added
+- Exceptions improved, [#60](https://github.com/swaggest/json-diff/pull/59).
+
 ## [3.10.1] - 2022-10-24
 
 ### Added
@@ -85,6 +90,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Compatibility option to `TOLERATE_ASSOCIATIVE_ARRAYS` that mimic JSON objects.
 
+[3.10.2]: https://github.com/swaggest/json-diff/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/swaggest/json-diff/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/swaggest/json-diff/compare/v3.9.0...v3.10.0
 [3.9.0]: https://github.com/swaggest/json-diff/compare/v3.8.3...v3.9.0
