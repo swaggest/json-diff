@@ -70,13 +70,6 @@ class JsonPatch implements \JsonSerializable
                 throw new MissingFieldException('path', $operation);
             }
 
-            if (!is_string($operation->op)) {
-                throw new InvalidFieldTypeException('op', 'string', $operation);
-            }
-            if (!is_string($operation->path)) {
-                throw new InvalidFieldTypeException('path', 'string', $operation);
-            }
-
             $op = null;
             switch ($operation->op) {
                 case Add::OP:
@@ -98,8 +91,17 @@ class JsonPatch implements \JsonSerializable
                     $op = new Test();
                     break;
                 default:
+                    if (!is_string($operation->op)) {
+                        throw new InvalidFieldTypeException('op', 'string', $operation);
+                    }
+
                     throw new UnknownOperationException($operation);
             }
+
+            if (!is_string($operation->path)) {
+                throw new InvalidFieldTypeException('path', 'string', $operation);
+            }
+            
             $op->path = $operation->path;
             if ($op instanceof OpPathValue) {
                 if (property_exists($operation, 'value')) {
