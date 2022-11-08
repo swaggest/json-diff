@@ -3,6 +3,7 @@
 namespace Swaggest\JsonDiff\Tests;
 
 use Swaggest\JsonDiff\Exception;
+use Swaggest\JsonDiff\InvalidFieldTypeException;
 use Swaggest\JsonDiff\JsonDiff;
 use Swaggest\JsonDiff\JsonPatch;
 use Swaggest\JsonDiff\JsonPatch\OpPath;
@@ -108,6 +109,52 @@ JSON;
 			$this->assertSame('Unknown "op": wat', $exception->getMessage());
 			$this->assertSame($operation, $exception->getOperation());
 		}
+    }
+
+    /**
+     * @dataProvider provideInvalidFieldType
+     *
+     * @param object $operation
+     * @param string $expectedMessage
+     * @param string $expectedField
+     * @param string $expectedType
+     */
+    public function testInvalidFieldType($operation, $expectedMessage, $expectedField, $expectedType)
+    {
+        try {
+            JsonPatch::import(array($operation));
+            $this->fail('Expected exception was not thrown');
+        } catch (Exception $exception) {
+            $this->assertInstanceOf(InvalidFieldTypeException::class, $exception);
+            $this->assertSame($expectedMessage, $exception->getMessage());
+            $this->assertSame($expectedField, $exception->getField());
+            $this->assertSame($expectedType, $exception->getExpectedType());
+            $this->assertSame($operation, $exception->getOperation());
+        }
+    }
+
+    public function provideInvalidFieldType()
+    {
+        return [
+            '"op" invalid type' => [
+                (object)array('op' => array('foo' => 'bar'), 'path' => '/123', 'value' => 'test'),
+                'Invalid field type - "op" should be of type: string',
+                'op',
+                'string'
+            ],
+            '"path" invalid type' => [
+                (object)array('op' => 'add', 'path' => array('foo' => 'bar'), 'value' => 'test'),
+                'Invalid field type - "path" should be of type: string',
+                'path',
+                'string'
+            ],
+            '"from" invalid type' => [
+                (object)array('op' => 'move', 'path' => '/123', 'from' => array('foo' => 'bar')),
+                'Invalid field type - "from" should be of type: string',
+                'from',
+                'string'
+            ]
+        ];
     }
 
     public function testMissingFrom()

@@ -59,7 +59,6 @@ class JsonPatch implements \JsonSerializable
             if (is_array($operation)) {
                 $operation = (object)$operation;
             }
-
             if (!is_object($operation)) {
                 throw new Exception('Invalid patch operation - should be a JSON object');
             }
@@ -69,6 +68,13 @@ class JsonPatch implements \JsonSerializable
             }
             if (!isset($operation->path)) {
                 throw new MissingFieldException('path', $operation);
+            }
+
+            if (!is_string($operation->op)) {
+                throw new InvalidFieldTypeException('op', 'string', $operation);
+            }
+            if (!is_string($operation->path)) {
+                throw new InvalidFieldTypeException('path', 'string', $operation);
             }
 
             $op = null;
@@ -104,6 +110,8 @@ class JsonPatch implements \JsonSerializable
             } elseif ($op instanceof OpPathFrom) {
                 if (!isset($operation->from)) {
                     throw new MissingFieldException('from', $operation);
+                } elseif (!is_string($operation->from)) {
+                    throw new InvalidFieldTypeException('from', 'string', $operation);
                 }
                 $op->from = $operation->from;
             }
