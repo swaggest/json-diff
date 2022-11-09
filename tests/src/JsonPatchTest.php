@@ -137,7 +137,7 @@ JSON;
     {
         return [
             '"op" invalid type' => [
-                (object)array('op' => array('foo' => 'bar'), 'path' => '/123', 'value' => 'test'),
+                (object)array('op' => true, 'path' => '/123', 'value' => 'test'),
                 'Invalid field type - "op" should be of type: string',
                 'op',
                 'string'
