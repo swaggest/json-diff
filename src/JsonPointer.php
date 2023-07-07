@@ -285,7 +285,7 @@ class JsonPointer
                 if ($flags & self::TOLERATE_ASSOCIATIVE_ARRAYS) {
                     $i = 0;
                     foreach ($parent as $index => $value) {
-                        if ($i !== $index) {
+                        if ($i++ !== $index) {
                             $isAssociative = true;
                             break;
                         }
