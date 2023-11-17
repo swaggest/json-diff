@@ -96,6 +96,13 @@ class JsonPointerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $s->one->two);
     }
 
+    public function testSequentialArrayIsPreserved()
+    {
+		$json = [ 'l1' => [ 0 => 'foo', 1 => 'bar', 2 => 'baz' ] ];
+		JsonPointer::remove($json, ['l1', '1'], JsonPointer::TOLERATE_ASSOCIATIVE_ARRAYS);
+		$this->assertSame('{"l1":["foo","baz"]}', json_encode($json));
+    }
+
 }
 
 class Sample
