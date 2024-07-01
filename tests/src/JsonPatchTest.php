@@ -229,20 +229,21 @@ JSON;
         $data = array('abc' => $actualValue);
         $patch = new JsonPatch();
 
-        $operation1 = new JsonPatch\Test('/abc', 'def');
-        $patch->op($operation1);
+        $operation0 = new JsonPatch\Test('/abc', 'def');
+        $patch->op($operation0);
 
-        $operation2 = new JsonPatch\Move('/target', '/source');
-        $patch->op($operation2);
+        $operation1 = new JsonPatch\Move('/target', '/source');
+        $patch->op($operation1);
 
         $errors = $patch->apply($data, false);
 
         $this->assertInstanceOf(PatchTestOperationFailedException::class, $errors[0]);
-        $this->assertSame($operation1, $errors[0]->getOperation());
+        $this->assertSame($operation0, $errors[0]->getOperation());
 
         $this->assertInstanceOf(PathException::class, $errors[1]);
-        $this->assertSame($operation2, $errors[1]->getOperation());
+        $this->assertSame($operation1, $errors[1]->getOperation());
         $this->assertSame('from', $errors[1]->getField());
+        $this->assertEquals(1, $errors[1]->getOpIndex());
     }
 
     public function pathExceptionProvider() {
@@ -305,6 +306,7 @@ JSON;
             $this->assertInstanceOf(PathException::class, $ex);
             $this->assertEquals($expectedMessage, $ex->getMessage());
             $this->assertEquals($expectedField, $ex->getField());
+            $this->assertEquals(0, $ex->getOpIndex()); // There is only one operation
         }
     }
 }
