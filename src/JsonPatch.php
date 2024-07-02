@@ -151,7 +151,7 @@ class JsonPatch implements \JsonSerializable
     public function apply(&$original, $stopOnError = true)
     {
         $errors = array();
-        foreach ($this->operations as $operation) {
+        foreach ($this->operations as $opIndex => $operation) {
             try {
                 // track the current pointer field so we can use it for a potential PathException
                 $pointerField = 'path';
@@ -199,6 +199,7 @@ class JsonPatch implements \JsonSerializable
                     $pointerField,
                     $jsonPointerException->getCode()
                 );
+                $pathException->setOpIndex($opIndex);
                 if ($stopOnError) {
                     throw $pathException;
                 } else {
