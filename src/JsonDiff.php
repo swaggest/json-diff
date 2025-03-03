@@ -341,12 +341,8 @@ class JsonDiff
 
             $path = $this->path;
             $pathItems = $this->pathItems;
-            $actualKey = $key;
-            if ($isArray && is_int($actualKey)) {
-                $actualKey -= $removedOffset;
-            }
-            $this->path .= '/' . JsonPointer::escapeSegment((string)$actualKey, $isUriFragment);
-            $this->pathItems[] = $actualKey;
+            $this->path .= '/' . JsonPointer::escapeSegment((string)$key, $isUriFragment);
+            $this->pathItems[] = $key;
 
             if (array_key_exists($key, $newArray)) {
                 $newOrdered[$key] = $this->process($originalValue, $newArray[$key]);
