@@ -263,7 +263,7 @@ class JsonDiff
     private function process($original, $new)
     {
         $merge = !($this->options & self::SKIP_JSON_MERGE_PATCH);
-        
+
         $addTestOps = !($this->options & self::SKIP_TEST_OPS);
 
         if ($this->options & self::TOLERATE_ASSOCIATIVE_ARRAYS) {
